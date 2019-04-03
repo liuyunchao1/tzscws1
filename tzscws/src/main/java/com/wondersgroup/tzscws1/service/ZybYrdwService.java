@@ -9,5 +9,7 @@ import java.util.List;
 public interface ZybYrdwService {
     public List<ZybYrdw> selectByEmployerName(String employerName);
     public ZybYrdw selectByPrimaryKey(String employerCode);
+    public int updateByPrimaryKey(ZybYrdw zybYrdw);
+    public int insert(ZybYrdw zybYrdw);
 
 }

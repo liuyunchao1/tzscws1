@@ -1,31 +1,28 @@
 package com.wondersgroup.tzscws1.controller;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import com.wondersgroup.tzscws1.entity.BodyDataEntity;
 import com.wondersgroup.tzscws1.entity.HeaderDataEntty;
 import com.wondersgroup.tzscws1.model.CodeInfo;
 import com.wondersgroup.tzscws1.model.ZybGak;
 import com.wondersgroup.tzscws1.model.ZybYrdw;
-import com.wondersgroup.tzscws1.service.CodeInfoService;
-import com.wondersgroup.tzscws1.service.ZybGakService;
+import com.wondersgroup.tzscws1.service.CodeInfoServiceImpl;
 import com.wondersgroup.tzscws1.service.ZybGakServiceImpl;
-import com.wondersgroup.tzscws1.service.ZybYrdwService;
+import com.wondersgroup.tzscws1.service.ZybYrdwServiceImpl;
 import com.wondersgroup.tzscws1.verification.Verification;
-import jdk.internal.dynalink.beans.StaticClass;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
-@Controller
+@RestController
+@RequestMapping(value = "/tzscws")
 public class ReadStringXmlController {
     /**
      * 测试解析xml字符串
@@ -33,23 +30,14 @@ public class ReadStringXmlController {
      * @param args
      */
     @Autowired
-    private ZybGakService zybGakService;
+    private ZybGakServiceImpl zybGakServiceImpl;
     @Autowired
-    private ZybYrdwService zybYrdwService;
+    private ZybYrdwServiceImpl zybYrdwServiceImpl;
     @Autowired
-    private CodeInfoService codeInfoService;
-    private String errorCode;
+    private CodeInfoServiceImpl codeInfoServiceImpl;
+
     public static final String SUCCED = "suceed";
-
-    public static void main(String[] args) {
-
-        Document retDoc = DocumentHelper.createDocument();
-        retDoc.setXMLEncoding("UTF-8");
-        Element dataInfo = retDoc.addElement("data");
-        Element returnCode = dataInfo.addElement("returnCode");
-        Element message = dataInfo.addElement("message");
-        ReadStringXmlController readxml = new ReadStringXmlController();
-        String xml = "<data>" +
+      /*   xml = "<data>" +
                 "<header>" +
                 "<eventId>业务请求类型编码</eventId>" +
                 "<hosId>医院编码</hosId>" +
@@ -60,44 +48,77 @@ public class ReadStringXmlController {
                 "<body>" +
                 "<reportCards>" +
                 "<reportCard>" +
-                "<code>2</code>" +
+                "<code>88</code>" +
                 "<hosId>331003001</hosId>" +
+                "<orgCode>1</orgCode>"+
                 "<name>gfdgfg</name>" +
                 "<idcard>43243253</idcard>" +
                 "<bodyCheckType>1</bodyCheckType>" +
                 "<sexCode>2</sexCode>" +
-                "<birthday>199101-12</birthday>" +
-                "<hazardCode>4324354</hazardCode>" +
-                "<hazardYear>1991</hazardYear>" +
+                "<birthday>1991-01-12</birthday>" +
+                "<hazardCode>5,6</hazardCode>" +
+                "<hazardYear>11</hazardYear>" +
                 "<hazardMonth>12</hazardMonth>" +
-                "<sysPressResult>dweq3</sysPressResult>" +
-                "<diasPressResult>3r353df</diasPressResult>" +
-                "<ECGCode>19912</ECGCode>" +
-                "<conclusionsCode>1990112</conclusionsCode>" +
+                "<sysPressResult>22.2</sysPressResult>" +
+                "<diasPressResult>6.66</diasPressResult>" +
+                "<seniorityYear>8</seniorityYear>" +
+                "<seniorityMonth>8</seniorityMonth>" +
+                "<ECGCode>0230</ECGCode>" +
+                "<conclusionsCode>1</conclusionsCode>" +
                 "</reportCard>" +
                 "<reportCard>" +
                 "<code>788</code>" +
                 "<hosId>22434</hosId>" +
-                "<name>gfdgfg</name>" +
+                "<orgCode>1</orgCode>"+
+                "<name>liuyunchao</name>" +
                 "<idcard>43243253</idcard>" +
                 "<bodyCheckType>1</bodyCheckType>" +
                 "<sexCode>2</sexCode>" +
-                "<birthday>199101-12</birthday>" +
-                "<hazardCode>4324354</hazardCode>" +
-                "<hazardYear>1991</hazardYear>" +
+                "<birthday>1991-01-12</birthday>" +
+                "<hazardCode>5,6</hazardCode>" +
+                "<hazardYear>19</hazardYear>" +
                 "<hazardMonth>12</hazardMonth>" +
-                "<sysPressResult>dweq3</sysPressResult>" +
-                "<diasPressResult>3r353df</diasPressResult>" +
-                "<ECGCode>19912</ECGCode>" +
-                "<conclusionsCode>1990112</conclusionsCode>" +
+                "<sysPressResult>3.33</sysPressResult>" +
+                "<diasPressResult>4.44</diasPressResult>" +
+                "<seniorityYear>9</seniorityYear>" +
+                "<seniorityMonth>9</seniorityMonth>" +
+                "<ECGCode>0250</ECGCode>" +
+                "<conclusionsCode>2</conclusionsCode>" +
                 "</reportCard>" +
                 "</reportCards>" +
+                "<employingUnits>"+
+                "<employingUnit>" +
+                "<employerCode>3</employerCode>"+
+                "<employerName>刘云超</employerName>"+
+                "<employerDesc>台州医院好</employerDesc>"+
+                "<areaStandard>21243435</areaStandard>"+
+                "<areaAddress>长啥</areaAddress>"+
+                "<economicCode>160a</economicCode>"+
+                "<industryCateCode>24</industryCateCode>"+
+                "<enterpriseCode>004</enterpriseCode>"+
+                "<postAddress>长沙市岳麓区</postAddress>"+
+                "<zipCode>425000</zipCode>"+
+                "<contactPerson>刘云超</contactPerson>"+
+                "<contactPhone>1244566</contactPhone>"+
+                "</employingUnit>" +
+                 "<employingUnit>" +
+                 "<employerCode>2</employerCode>"+
+                 "<employerName>刘超</employerName>"+
+                 "<employerDesc>台州医院好</employerDesc>"+
+                 "<areaStandard>21243435</areaStandard>"+
+                 "<areaAddress>长啥</areaAddress>"+
+                 "<economicCode>160a</economicCode>"+
+                 "<industryCateCode>24</industryCateCode>"+
+                 "<enterpriseCode>005</enterpriseCode>"+
+                 "<postAddress>长沙市岳麓区</postAddress>"+
+                 "<zipCode>425000</zipCode>"+
+                 "<contactPerson>刘云超</contactPerson>"+
+                 "<contactPhone>1244566</contactPhone>"+
+                 "</employingUnit>" +
+                "</employingUnits>"+
                 "</body>" +
-                "</data>";
+                "</data>";*/
         //解析xml头部
-        String bodyDatas = readxml.readStringXml(xml);
-
-    }
 
     /**
      * 解析header 头部返回HeaderDataEntty对像
@@ -113,7 +134,7 @@ public class ReadStringXmlController {
             //
             // SAXReader reader = new SAXReader(); //User.hbm.xml表示你要解析的xml文档
             // Document document = reader.read(new File("User.hbm.xml"));
-            // 下面的是通过解析xml字符串的
+            // 下面的是通过解析xml字符串的new String(text.getBytes("gbk")，"utf-8");
             doc = DocumentHelper.parseText(xml); // 将字符串转为XML
             Element rootElt = doc.getRootElement(); // 获取根节点
             System.out.println("根节点：" + rootElt.getName()); // 拿到根节点的名称
@@ -124,9 +145,8 @@ public class ReadStringXmlController {
                 Element recordEle = (Element) iter.next();
                 String nodeName = recordEle.getName();
                 System.out.println(nodeName);
-//                String title = recordEle.elementTextTrim("title"); // 拿到head节点下的子节点title值
+//               String title = recordEle.elementTextTrim("title"); // 拿到head节点下的子节点title值
                 Iterator iters = recordEle.elementIterator();// 拿到head节点下的所有子节点值
-
                 while (iters.hasNext()) {
                     Element itemEle = (Element) iters.next();
                     String nodeNames = itemEle.getName();
@@ -156,13 +176,12 @@ public class ReadStringXmlController {
             e.printStackTrace();
 
         }
-
         return headerData;
 
     }
-
-
-    public String readStringXml(String xml) {
+    @ResponseBody
+    @RequestMapping(value="/dataExchange",method = RequestMethod.POST)
+    public String reportZybData(String xml) {
         //返回xml格式字符串
         System.out.println(xml);
         Document retDoc = DocumentHelper.createDocument();
@@ -170,6 +189,12 @@ public class ReadStringXmlController {
         Element dataInfo = retDoc.addElement("data");
         Element returnCode = dataInfo.addElement("returnCode");
         Element message = dataInfo.addElement("message");
+        if(StringUtils.isEmpty(xml)){
+            returnCode.setText("105");
+            message.setText("请求参数为空!");
+            System.out.println("请求参数为空!");
+            return retDoc.toString();
+        }
         HeaderDataEntty headerDatas = readStringHeader(xml);
         boolean flag = false;
         if (headerDatas != null) {
@@ -186,12 +211,7 @@ public class ReadStringXmlController {
         Document doc = null;
 
         try {
-
             // 读取并解析XML文档
-            // SAXReader就是一个管道，用一个流的方式，把xml文件读出来
-            //
-            // SAXReader reader = new SAXReader(); //User.hbm.xml表示你要解析的xml文档
-            // Document document = reader.read(new File("User.hbm.xml"));
             // 下面的是通过解析xml字符串的
             doc = DocumentHelper.parseText(xml); // 将字符串转为XML
             Element rootElt = doc.getRootElement(); // 获取根节点
@@ -201,31 +221,112 @@ public class ReadStringXmlController {
             System.out.println("bodyElt：" + bodyElt.getName()); // 拿到根节点的名称
             Element reportCardsElt = bodyElt.element("reportCards");
             Iterator iterss = reportCardsElt.elementIterator("reportCard");
+            Element employingUnits = bodyElt.element("employingUnits");
+            System.out.println("bodyElt：" + employingUnits.getName()); // 拿到根节点的名称
+            Iterator employingUnitIte = employingUnits.elementIterator("employingUnit");
             // 遍历reportCard节点
-            String codeResult = "";
-            String hosIdResult = "";
-            String nameResult = "";
-            String idcardResult = "";
-            String bodyCheckTypeResult = "";
-            String sexCodeResult = "";
-            String birthdayResult = "";
-            String hazardCodeResult = "";//多种结果之间使用英文逗号（,）分隔
-            String hazardYearResult = "";
-            String hazardMonthResult = "";
-            String sysPressResult = "";
-            String diasPressResult = "";
-            String ECGCodeResult = "";//多种结果之间使用英文逗号（,）分隔
-            String conclusionsCodeResult="";
-            String orgCode = "";
-            String employerName = "";
-            List<BodyDataEntity> emtList = new ArrayList<BodyDataEntity>();
-            List<ZybGak> errorList = new ArrayList<ZybGak>();
+             String codeResult = "";
+             String hosIdResult = "";
+             String nameResult= "";
+             String idcardResult= "";
+             String bodyCheckTypeResult= "";
+             String sexCodeResult= "";
+             String birthdayResult= "";
+             String hazardCodeResult= "";//多种结果之间使用英文逗号（,）分隔
+             String hazardYearResult= "";
+             String hazardMonthResult= "";
+             String sysPressResult= "";
+             String diasPressResult= "";
+             String ECGCodeResult= "";//多种结果之间使用英文逗号（,）分隔
+             String conclusionsCodeResult= "";
+             String orgCodeResult= "";
+             String employerNameResult= "";
+             String telPhoneResult= "";
+             String seniorityYearResult= "";
+             String seniorityMonthResult= "";
+             String exposureYearResult= "";
+             String exposureMonthResult= "";
+             String workShopResult= "";
+             String jobCodeResult= "";
+             String sysPressUnitNameResult= "";
+             String diasPressUnitNameResult= "";
+             String WBCResult= "";
+             String WBCUnitNameResult= "";
+             String WBCMiniRangeResult= "";
+             String WBCMaxRangeResult= "";
+             String RBCResult= "";
+             String RBCUnitNameResult= "";
+             String RBCMiniRangeResult= "";
+             String RBCMaxRangeResult= "";
+             String HbResult= "";
+             String HbUnitNameResult= "";
+             String HbMiniRangeResult= "";
+             String HbMaxRangeResult= "";
+             String PLTResult= "";
+             String PLTUnitNameResult= "";
+             String PLTMiniRangeResult= "";
+             String PLTMaxRangeResult= "";
+             String GLUResult= "";
+             String GLUUnitNameResult= "";
+             String GLUMiniRangeResult= "";
+             String GLUMaxRangeResult= "";
+             String PROResult= "";
+             String PROUnitNameResult= "";
+             String PROMiniRangeResult= "";
+             String PROMaxRangeResult= "";
+             String UWBCResult= "";
+             String UWBCUnitNameResult= "";
+             String UWBCMiniRangeResult= "";
+             String UWBCMaxRangeResult= "";
+             String BLDResult= "";
+             String BLDUnitNameResult= "";
+             String BLDMiniRangeResult= "";
+             String BLDMaxRangeResult= "";
+             String ALTResult= "";
+             String ALTUnitNameResult= "";
+             String ALTMiniRangeResult= "";
+             String ALTMaxRangeResult= "";
+             String CHESTCodeResult = "";
+             String FVCResult= "";
+             String FVCUnitNameResult= "";
+             String FVCMiniRangeResult= "";
+             String FVCMaxRangeResult= "";
+             String FEV1Result= "";
+             String FEV1UnitNameResult= "";
+             String FEV1MiniRangeResult= "";
+             String FEV1MaxRangeResult= "";
+             String FEV1FVCResult= "";
+             String FEV1FVCUnitNameResult= "";
+             String FEV1FVCMiniRangeResult= "";
+             String FEV1FVCMaxRangeResult= "";
+             String BLeadResult= "";
+             String BLeadUnitNameResult= "";
+             String BLeadMiniRangeResult= "";
+             String BLeadMaxRangeResult= "";
+             String ULeadResult= "";
+             String ULeadUnitNameResult= "";
+             String ULeadMiniRangeResult= "";
+             String ULeadMaxRangeResult= "";
+             String ZPPResult= "";
+             String ZPPUnitNameResult= "";
+             String ZPPMiniRangeResult= "";
+             String ZPPMaxRangeResult= "";
+             String NeutResult= "";
+             String NeutUnitNameResult= "";
+             String NeutMiniRangeResult= "";
+             String NeutMaxRangeResult= "";
+             String hearingReuslt= "";
+             String hearingUnitNameResult= "";
+             String hearingMiniRangeResult= "";
+             String hearingMaxRangeResult= "";
+             String RPBTCodeResult= "";
+             String wrightCodeResult= "";
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             while (iterss.hasNext()) {
                 Element recordEless = (Element) iterss.next();
                 //字段空值校验
-                BodyDataEntity bodyDataEntity = new BodyDataEntity();
+                ZybGak zybGak = new ZybGak();
                 codeResult = recordEless.elementTextTrim("code");
-                System.out.println("codeResult:"+codeResult);
                 hosIdResult = recordEless.elementTextTrim("hosId");
                 nameResult = recordEless.elementTextTrim("name");
                 idcardResult = recordEless.elementTextTrim("idcard");
@@ -239,8 +340,87 @@ public class ReadStringXmlController {
                 diasPressResult = recordEless.elementTextTrim("diasPressResult");
                 ECGCodeResult = recordEless.elementTextTrim("ECGCode");//多种结果之间使用英文逗号（,）分隔
                 conclusionsCodeResult = recordEless.elementTextTrim("conclusionsCode");
+                telPhoneResult = recordEless.elementTextTrim("telPhone");
+                seniorityYearResult = recordEless.elementTextTrim("seniorityYear");
+                seniorityMonthResult = recordEless.elementTextTrim("seniorityMonth");
+                exposureYearResult = recordEless.elementTextTrim("exposureYear");
+                exposureMonthResult = recordEless.elementTextTrim("exposureMonth");
+                workShopResult = recordEless.elementTextTrim("workShop");
+                jobCodeResult = recordEless.elementTextTrim("jobCode");
+                sysPressUnitNameResult = recordEless.elementTextTrim("sysPressUnitName");
+                diasPressUnitNameResult = recordEless.elementTextTrim("diasPressUnitName");
+                WBCResult = recordEless.elementTextTrim("WBCResult");
+                WBCUnitNameResult = recordEless.elementTextTrim("WBCUnitName");
+                WBCMiniRangeResult = recordEless.elementTextTrim("WBCMiniRange");
+                WBCMaxRangeResult = recordEless.elementTextTrim("WBCMaxRange");
+                RBCResult = recordEless.elementTextTrim("RBCResult");
+                RBCUnitNameResult = recordEless.elementTextTrim("RBCUnitName");
+                RBCMiniRangeResult = recordEless.elementTextTrim("RBCMiniRange");
+                RBCMaxRangeResult = recordEless.elementTextTrim("RBCMaxRange");
+                HbResult = recordEless.elementTextTrim("HbResult");
+                HbUnitNameResult = recordEless.elementTextTrim("HbUnitName");
+                HbMiniRangeResult = recordEless.elementTextTrim("HbMiniRange");
+                HbMaxRangeResult = recordEless.elementTextTrim("HbMaxRange");
+                PLTResult = recordEless.elementTextTrim("PLTResult");
+                PLTUnitNameResult = recordEless.elementTextTrim("PLTUnitName");
+                PLTMiniRangeResult = recordEless.elementTextTrim("PLTMiniRange");
+                PLTMaxRangeResult = recordEless.elementTextTrim("PLTMaxRange");
+                GLUResult = recordEless.elementTextTrim("GLUResult");
+                GLUUnitNameResult = recordEless.elementTextTrim("GLUUnitName");
+                GLUMiniRangeResult = recordEless.elementTextTrim("GLUMiniRange");
+                GLUMaxRangeResult = recordEless.elementTextTrim("GLUMaxRange");
+                PROResult = recordEless.elementTextTrim("PROResult");
+                PROUnitNameResult = recordEless.elementTextTrim("PROUnitName");
+                PROMiniRangeResult = recordEless.elementTextTrim("PROMiniRange");
+                PROMaxRangeResult = recordEless.elementTextTrim("PROMaxRange");
+                UWBCResult = recordEless.elementTextTrim("UWBCResult");
+                UWBCUnitNameResult = recordEless.elementTextTrim("UWBCUnitName");
+                UWBCMiniRangeResult = recordEless.elementTextTrim("UWBCMiniRange");
+                UWBCMaxRangeResult = recordEless.elementTextTrim("UWBCMaxRange");
+                BLDResult = recordEless.elementTextTrim("BLDResult");
+                BLDUnitNameResult = recordEless.elementTextTrim("BLDUnitName");
+                BLDMiniRangeResult = recordEless.elementTextTrim("BLDMiniRange");
+                BLDMaxRangeResult = recordEless.elementTextTrim("BLDMaxRange");
+                ALTResult = recordEless.elementTextTrim("ALTResult");
+                ALTUnitNameResult = recordEless.elementTextTrim("ALTUnitName");
+                ALTMiniRangeResult = recordEless.elementTextTrim("ALTMiniRange");
+                ALTMaxRangeResult = recordEless.elementTextTrim("ALTMaxRange");
+                CHESTCodeResult = recordEless.elementTextTrim("CHESTCode");
+                FVCResult = recordEless.elementTextTrim("FVCResult");
+                FVCUnitNameResult = recordEless.elementTextTrim("FVCUnitName");
+                FVCMiniRangeResult = recordEless.elementTextTrim("FVCMiniRange");
+                FVCMaxRangeResult = recordEless.elementTextTrim("FVCMaxRange");
+                FEV1Result = recordEless.elementTextTrim("FEV1Result");
+                FEV1UnitNameResult = recordEless.elementTextTrim("FEV1UnitName");
+                FEV1MiniRangeResult = recordEless.elementTextTrim("FEV1MiniRange");
+                FEV1MaxRangeResult = recordEless.elementTextTrim("FEV1MaxRange");
+                FEV1FVCResult = recordEless.elementTextTrim("FEV1FVCResult");
+                FEV1FVCUnitNameResult = recordEless.elementTextTrim("FEV1FVCUnitName");
+                FEV1FVCMiniRangeResult = recordEless.elementTextTrim("FEV1FVCMiniRange");
+                FEV1FVCMaxRangeResult = recordEless.elementTextTrim("FEV1FVCMaxRange");
+                BLeadResult = recordEless.elementTextTrim("BLeadResult");
+                BLeadUnitNameResult = recordEless.elementTextTrim("BLeadUnitName");
+                BLeadMiniRangeResult = recordEless.elementTextTrim("BLeadMiniRange");
+                BLeadMaxRangeResult = recordEless.elementTextTrim("BLeadMaxRange");
+                ULeadResult = recordEless.elementTextTrim("ULeadResult");
+                ULeadUnitNameResult = recordEless.elementTextTrim("ULeadUnitName");
+                ULeadMiniRangeResult = recordEless.elementTextTrim("ULeadMiniRange");
+                ULeadMaxRangeResult = recordEless.elementTextTrim("ULeadMaxRange");
+                ZPPResult = recordEless.elementTextTrim("ZPPResult");
+                ZPPUnitNameResult = recordEless.elementTextTrim("ZPPUnitName");
+                ZPPMiniRangeResult = recordEless.elementTextTrim("ZPPMiniRange");
+                ZPPMaxRangeResult = recordEless.elementTextTrim("ZPPMaxRange");
+                NeutResult = recordEless.elementTextTrim("NeutResult");
+                NeutUnitNameResult = recordEless.elementTextTrim("NeutUnitName");
+                NeutMiniRangeResult = recordEless.elementTextTrim("NeutMiniRange");
+                NeutMaxRangeResult = recordEless.elementTextTrim("NeutMaxRange");
+                hearingReuslt = recordEless.elementTextTrim("hearingReuslt");
+                hearingUnitNameResult = recordEless.elementTextTrim("hearingUnitName");
+                hearingMiniRangeResult = recordEless.elementTextTrim("hearingMiniRange");
+                hearingMaxRangeResult = recordEless.elementTextTrim("hearingMaxRange");
+                RPBTCodeResult = recordEless.elementTextTrim("RPBTCode");
+                wrightCodeResult = recordEless.elementTextTrim("wrightCode");
                 boolean empFlag = checkStringIsNull( codeResult,hosIdResult, nameResult, idcardResult, bodyCheckTypeResult, sexCodeResult, birthdayResult, hazardCodeResult, hazardYearResult, hazardMonthResult, sysPressResult, diasPressResult, ECGCodeResult, conclusionsCodeResult);
-                System.out.println("必填请求参数有空值:" + empFlag);
                 if (empFlag) {
                     returnCode.setText("105");
                     message.setText("必填请求参数有空值!");
@@ -248,20 +428,179 @@ public class ReadStringXmlController {
                     System.out.println("必填请求参数有空值:" + retDoc.asXML());
                     return retDoc.asXML();
                 }
-                orgCode = recordEless.elementTextTrim("orgCode");
-                employerName = recordEless.elementTextTrim("employerName");
+                List<CodeInfo>  CodeInfoList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(901));
+                //判断bodyCheckType是否在字典值域
+                boolean bodyCheckInflag = false;
+                for(CodeInfo codeInfo : CodeInfoList){
+                    if(bodyCheckTypeResult.equals(codeInfo.getCode())){
+                        bodyCheckInflag=true;
+                        break;
+                    }
+                }
+                if(!bodyCheckInflag){
+                    returnCode.setText("102");
+                    message.setText("无法找到体检类型编码!");
+                    System.out.println("无法找到体检类型编码!");
+                    System.out.println("无法找到体检类型编码:" + retDoc.asXML());
+                    return retDoc.asXML();
+                }
+                //sexCode性别代码表
+                List<CodeInfo>  sexCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(124));
+                boolean sexCodeflag=false;
+                for(CodeInfo codeInfo : sexCodeList){
+                    if(sexCodeResult.equals(codeInfo.getCode())){
+                        sexCodeflag=true;
+                        break;
+                    }
+                }
+                if(!sexCodeflag){
+                    returnCode.setText("102");
+                    message.setText("无法找到性别编码!");
+                    System.out.println("无法找到性别编码!");
+                    System.out.println("无法找到性别编码:" + retDoc.asXML());
+                    return retDoc.asXML();
+                }
+                //判断接触监测的主要职业病危害因素编码hazardCode格式
+                List<CodeInfo>  hazardCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(900));
+                //判断数组的长度等于hazardCodeList的长度时所有值都在表里面
+                ArrayList<Integer> hazardCodeInflagList = new ArrayList<Integer>();
+                boolean  hazardCodeInflag = false;
+                if(hazardCodeResult.indexOf(",")==-1){
+                    for(CodeInfo codeInfo : hazardCodeList){
+                        if(hazardCodeResult.equals(codeInfo.getCode())){
+                            hazardCodeInflag=true;
+                            break;
+                        }
+                    }
+                    if(!hazardCodeInflag){
+                        returnCode.setText("102");
+                        message.setText("无法找到接触监测的主要职业病危害因素编码!");
+                        System.out.println("无法找到接触监测的主要职业病危害因素编码:" + retDoc.asXML());
+                        return retDoc.asXML();
+                    }
+                }else{
+                    String[] hazardCodeSize = hazardCodeResult.split(",");
+                    for(int i=0;i<hazardCodeSize.length;i++){
+                        for(CodeInfo codeInfo : hazardCodeList){
+                            if(hazardCodeSize[i].equals(codeInfo.getCode())){
+                                hazardCodeInflagList.add(1);
+                                break;
+                            }
+                        }
+                    }
+                    if(!(hazardCodeSize.length==hazardCodeInflagList.size())){
+                        returnCode.setText("102");
+                        message.setText("无法找到接触监测的主要职业病危害因素编码!");
+                        System.out.println("无法找到接触监测的主要职业病危害因素编码:" + retDoc.asXML());
+                        return retDoc.asXML();
+                    }
+                }
+                //判断心电图编码ECGCode是否在字典里
+                List<CodeInfo>  ECGCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(902));
+                //判断数组的长度等于ECGCodeInflagList的长度时所有值都在表里面
+                ArrayList<Integer> ECGCodeInflagList = new ArrayList<Integer>();
+                boolean   ECGCodeInflag = false;
+                if(ECGCodeResult.indexOf(",")==-1){
+                    for(CodeInfo codeInfo : ECGCodeList){
+                        if(ECGCodeResult.equals(codeInfo.getCode())){
+                            ECGCodeInflag=true;
+                            break;
+                        }
+                    }
+                    if(!ECGCodeInflag){
+                        returnCode.setText("102");
+                        message.setText("无法找到心电图编码!");
+                        System.out.println("无法找到心电图编码:" + retDoc.asXML());
+                        return retDoc.asXML();
+                    }
+                }else{
+                    String[] ECGCodeSize = ECGCodeResult.split(",");
+                    for(int i=0;i<ECGCodeSize.length;i++){
+                        for(CodeInfo codeInfo : hazardCodeList){
+                            if(ECGCodeSize[i].equals(codeInfo.getCode())){
+                                ECGCodeInflagList.add(1);
+                                break;
+                            }
+                        }
+                    }
+                    if(!(ECGCodeSize.length==ECGCodeInflagList.size())){
+                        returnCode.setText("102");
+                        message.setText("无法找到心电图编码!");
+                        System.out.println("无法找到心电图编码:" + retDoc.asXML());
+                        return retDoc.asXML();
+                    }
+                }
+
+                //判断胸片编码CHESTCode是否在字典里
+                if(!"".equals(CHESTCodeResult) && CHESTCodeResult!=null){
+                    List<CodeInfo>  CHESTCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(903));
+                    //判断数组的长度等于ECGCodeInflagList的长度时所有值都在表里面
+                    ArrayList<Integer> CHESTCodeInflagList = new ArrayList<Integer>();
+                    boolean   CHESTCodeInflag = false;
+                    System.out.println("CHESTCodeResult:" + CHESTCodeResult);
+                    if(CHESTCodeResult.indexOf(",")==-1){
+                        for(CodeInfo codeInfo : CHESTCodeList){
+                            if(CHESTCodeResult.equals(codeInfo.getCode())){
+                                CHESTCodeInflag=true;
+                                break;
+                            }
+                        }
+                        if(!CHESTCodeInflag){
+                            returnCode.setText("102");
+                            message.setText("无法找到胸片编码!");
+                            System.out.println("无法找到胸片编码:" + retDoc.asXML());
+                            return retDoc.asXML();
+                        }
+                    }else{
+                        String[] CHESTCodeSize = CHESTCodeResult.split(",");
+                        for(int i=0;i<CHESTCodeSize.length;i++){
+                            for(CodeInfo codeInfo : CHESTCodeList){
+                                if(CHESTCodeSize[i].equals(codeInfo.getCode())){
+                                    CHESTCodeInflagList.add(1);
+                                    break;
+                                }
+                            }
+                        }
+                        if(!(CHESTCodeSize.length==CHESTCodeInflagList.size())){
+                            returnCode.setText("102");
+                            message.setText("无法找到胸片编码!");
+                            System.out.println("无法找到胸片编码:" + retDoc.asXML());
+                            return retDoc.asXML();
+                        }
+                    }
+                }
+
+                //conclusionsCode体检结论编码
+                List<CodeInfo>  conclusionsCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(904));
+                boolean conclusionsCodeflag=false;
+                for(CodeInfo codeInfo : conclusionsCodeList){
+                    if(conclusionsCodeResult.equals(codeInfo.getCode())){
+                        conclusionsCodeflag=true;
+                        break;
+                    }
+                }
+                if(!conclusionsCodeflag){
+                    returnCode.setText("102");
+                    message.setText("无法找到体检结论编码!");
+                    System.out.println("无法找到体检结论编码!");
+                    System.out.println("无法找到体检结论编码:" + retDoc.asXML());
+                    return retDoc.asXML();
+                }
+
+                orgCodeResult = recordEless.elementTextTrim("orgCode");
+                employerNameResult = recordEless.elementTextTrim("employerName");
                 //用人单位code和名称至少一项必填
-                boolean employeeFlag = checkEmpStringIsNull(orgCode,employerName);
+                System.out.println("orgCodeResult + employerNameResult！:" + orgCodeResult+"+" + employerNameResult);
+                boolean employeeFlag = checkEmpStringIsNull(orgCodeResult,employerNameResult);
                 if(employeeFlag){
                     returnCode.setText("105");
                     message.setText("用人单位编码与用人单位名称至少有一个不为空!");
-                    System.out.println("用人单位编码与用人单位名称至少有一个不为空!");
                     System.out.println("用人单位编码与用人单位名称至少有一个不为空！:" + retDoc.asXML());
                     return retDoc.asXML();
                 }
-                if(StringUtils.isEmpty(orgCode)){
+                if(StringUtils.isEmpty(orgCodeResult)){
                     //如果orgCode为空则查询employerName，否则查询orgCode
-                    List<ZybYrdw> zybYrdwList = zybYrdwService.selectByEmployerName(employerName);
+                    List<ZybYrdw> zybYrdwList = zybYrdwServiceImpl.selectByEmployerName(employerNameResult);
                     if(null==zybYrdwList || zybYrdwList.size()==0){
                         returnCode.setText("105");
                         message.setText("用人单位数据不存在!");
@@ -270,7 +609,8 @@ public class ReadStringXmlController {
                         return retDoc.asXML();
                     }
                 }else{
-                    ZybYrdw zybYrdw = zybYrdwService.selectByPrimaryKey(orgCode);
+                    System.out.println("组织code:" + orgCodeResult);
+                    ZybYrdw zybYrdw = zybYrdwServiceImpl.selectByPrimaryKey(orgCodeResult);
                     if(null==zybYrdw){
                         returnCode.setText("105");
                         message.setText("用人单位数据不存在!");
@@ -279,47 +619,267 @@ public class ReadStringXmlController {
                         return retDoc.asXML();
                     }
                 }
-                bodyDataEntity.setCode(codeResult);
-                bodyDataEntity.setBirthday(birthdayResult);
-                bodyDataEntity.setHosId(hosIdResult);
-                bodyDataEntity.setName(nameResult);
-                bodyDataEntity.setIdcard(idcardResult);
-                bodyDataEntity.setBodyCheckType(bodyCheckTypeResult);
-                bodyDataEntity.setSexCode(sexCodeResult);
-                bodyDataEntity.setHazardCode(hazardCodeResult);
-                bodyDataEntity.setHazardYear(hazardYearResult);
-                bodyDataEntity.setHazardMonth(hazardMonthResult);
-                bodyDataEntity.setSysPressResult(sysPressResult);
-                bodyDataEntity.setDiasPressResult(diasPressResult);
-                bodyDataEntity.setECGCode(ECGCodeResult);
-                bodyDataEntity.setConclusionsCode(conclusionsCodeResult);
-                emtList.add(bodyDataEntity);
+                //id 为唯一标识codeResult+hosIdResult
+                zybGak.setId(codeResult+hosIdResult);
+                zybGak.setCode(codeResult);
+                zybGak.setHosId(hosIdResult);
+                zybGak.setBirthday(sdf.parse(birthdayResult));
+                zybGak.setName(nameResult);
+                zybGak.setIdcard(idcardResult);
+                zybGak.setBodyCheckType(Short.parseShort(bodyCheckTypeResult));
+                zybGak.setSexCode(Short.parseShort(sexCodeResult));
+                zybGak.setHazardCode(hazardCodeResult);
+                zybGak.setHazardYear(Short.parseShort(hazardYearResult));
+                zybGak.setHazardMonth(Short.parseShort(hazardMonthResult));
+                zybGak.setSysPressResult(new BigDecimal(sysPressResult));
+                zybGak.setDiasPressResult(new BigDecimal(diasPressResult));
+                zybGak.setEcgCode(ECGCodeResult);
+                zybGak.setConclusionsCode(Short.parseShort(conclusionsCodeResult));
+                zybGak.setTelPhone(telPhoneResult);
+                if(!StringUtils.isEmpty(seniorityYearResult)){
+                    zybGak.setSeniorityYear(Short.parseShort(seniorityYearResult));
+                }
+                if(!StringUtils.isEmpty(seniorityMonthResult)){
+                    zybGak.setSeniorityMonth(Short.parseShort(seniorityMonthResult));
+                }
+                if(!StringUtils.isEmpty(exposureYearResult)){
+                    zybGak.setSeniorityMonth(Short.parseShort(exposureYearResult));
+                }
+                if(!StringUtils.isEmpty(exposureMonthResult)){
+                    zybGak.setExposureMonth(Short.parseShort(exposureMonthResult));
+                }
+                zybGak.setWorkShop(workShopResult);
+                zybGak.setJobCode(jobCodeResult);
+                zybGak.setSysPressUnitName(sysPressUnitNameResult);
+                zybGak.setDiasPressUnitName(diasPressUnitNameResult);
+                zybGak.setWbcResult(WBCResult);
+                zybGak.setWbcUnitName(WBCUnitNameResult);
+                zybGak.setWbcMiniRange(WBCMiniRangeResult);
+                zybGak.setWbcMaxRange(WBCMaxRangeResult);
+                zybGak.setRbcResult(RBCResult);
+                zybGak.setRbcMiniRange(RBCMiniRangeResult);
+                zybGak.setRbcMaxRange(RBCMaxRangeResult);
+                zybGak.setRbcUnitName(RBCUnitNameResult);
+                zybGak.setHbResult(HbResult);
+                zybGak.setHbUnitName(HbUnitNameResult);
+                zybGak.setHbMaxRange(HbMaxRangeResult);
+                zybGak.setHbMiniRange(HbMiniRangeResult);
+                zybGak.setPltResult(PLTResult);
+                zybGak.setPltUnitName(PLTUnitNameResult);
+                zybGak.setPltMaxRange(PLTMaxRangeResult);
+                zybGak.setPltMiniRange(PLTMiniRangeResult);
+                zybGak.setGluResult(GLUResult);
+                zybGak.setGluUnitName(GLUUnitNameResult);
+                zybGak.setGluResult(GLUMiniRangeResult);
+                zybGak.setGluResult(GLUMaxRangeResult);
+                zybGak.setGluResult(PROResult);
+                zybGak.setGluResult(PROUnitNameResult);
+                zybGak.setGluResult(PROMiniRangeResult);
+                zybGak.setGluResult(PROMaxRangeResult);
+                zybGak.setGluResult(UWBCResult);
+                zybGak.setGluResult(UWBCUnitNameResult);
+                zybGak.setGluResult(UWBCMiniRangeResult);
+                zybGak.setGluResult(UWBCMaxRangeResult);
+                zybGak.setGluResult(BLDResult);
+                zybGak.setGluResult(BLDUnitNameResult);
+                zybGak.setGluResult(BLDMiniRangeResult);
+                zybGak.setGluResult(BLDMaxRangeResult);
+                zybGak.setGluResult(ALTResult);
+                zybGak.setGluResult(ALTUnitNameResult);
+                zybGak.setGluResult(ALTMiniRangeResult);
+                zybGak.setGluResult(ALTMaxRangeResult);
+                zybGak.setGluResult(CHESTCodeResult);
+                zybGak.setGluResult(FVCResult);
+                zybGak.setGluResult(FVCUnitNameResult);
+                zybGak.setGluResult(FVCMiniRangeResult);
+                zybGak.setGluResult(FVCMaxRangeResult);
+                zybGak.setGluResult(FEV1Result);
+                zybGak.setGluResult(FEV1UnitNameResult);
+                zybGak.setGluResult(FEV1MiniRangeResult);
+                zybGak.setGluResult(FEV1MaxRangeResult);
+                zybGak.setGluResult(FEV1FVCResult);
+                zybGak.setGluResult(FEV1FVCUnitNameResult);
+                zybGak.setGluResult(FEV1FVCMiniRangeResult);
+                zybGak.setGluResult(FEV1FVCMaxRangeResult);
+                zybGak.setGluResult(BLeadResult);
+                zybGak.setGluResult(BLeadUnitNameResult);
+                zybGak.setGluResult(BLeadMiniRangeResult);
+                zybGak.setGluResult(BLeadMaxRangeResult);
+                zybGak.setGluResult(ULeadResult);
+                zybGak.setGluResult(ULeadUnitNameResult);
+                zybGak.setGluResult(ULeadMiniRangeResult);
+                zybGak.setGluResult(ULeadMaxRangeResult);
+                zybGak.setGluResult(ZPPResult);
+                zybGak.setGluResult(ZPPUnitNameResult);
+                zybGak.setGluResult(ZPPMiniRangeResult);
+                zybGak.setGluResult(ZPPMaxRangeResult);
+                zybGak.setGluResult(NeutResult);
+                zybGak.setGluResult(NeutUnitNameResult);
+                zybGak.setGluResult(NeutMiniRangeResult);
+                zybGak.setGluResult(NeutMaxRangeResult);
+                zybGak.setGluResult(hearingReuslt);
+                zybGak.setGluResult(hearingUnitNameResult);
+                zybGak.setGluResult(hearingMiniRangeResult);
+                zybGak.setGluResult(hearingMaxRangeResult);
+                zybGak.setGluResult(RPBTCodeResult);
+                zybGak.setGluResult(wrightCodeResult);
+                zybGak.setGluResult(conclusionsCodeResult);
+                //获取当前系统时间
+                Date currentTime = new Date();
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String dateString = formatter.format(currentTime);
+                Date currentDate = formatter.parse(dateString);
+                zybGak.setLogsj(currentDate);
+                //如果存在则跟新数据,否则新增数据
+                ZybGak isUpdate = zybGakServiceImpl.selectByPrimaryKey(zybGak.getId());
+                if(isUpdate==null){
+                    zybGak.setShbz("2");//未审核
+                    zybGakServiceImpl.insert(zybGak);
+                }else{
+                    zybGakServiceImpl.updateByPrimaryKey(zybGak);
+                }
             }
-            //格式校验
-            boolean formatFlag = isDateFormate(emtList, dataInfo);
+            ArrayList<ZybYrdw> ZybYrdwList =  new ArrayList<ZybYrdw>();
+            String employerCode = "";
+            String employerNameEN = "";
+            String employerDesc = "";
+            String areaStandard = "";
+            String areaAddress = "";
+            String economicCode = "";
+            String industryCateCode = "";
+            String enterpriseCode = "";
+            String secondEmployerCode = "";
+            String secondEmployerName = "";
+            String postAddress = "";
+            String zipCode = "";
+            String contactPerson = "";
+            String contactPhone = "";
+            String monitorOrgCode = "";
+            String monitorOrgName = "";
+            String remarks = "";
+           while(employingUnitIte.hasNext()){
+                ZybYrdw zybYrdw = new ZybYrdw();
+                Element employingUnit = (Element) employingUnitIte.next();
+                employerCode = employingUnit.elementTextTrim("employerCode");
+                employerNameEN = employingUnit.elementTextTrim("employerName");
+                employerDesc= employingUnit.elementTextTrim("employerDesc");
+                areaStandard = employingUnit.elementTextTrim("areaStandard");
+                areaAddress = employingUnit.elementTextTrim("areaAddress");
+                economicCode = employingUnit.elementTextTrim("economicCode");
+                industryCateCode = employingUnit.elementTextTrim("industryCateCode");
+                enterpriseCode = employingUnit.elementTextTrim("enterpriseCode");
+                secondEmployerCode = employingUnit.elementTextTrim("secondEmployerCode");
+                secondEmployerName = employingUnit.elementTextTrim("secondEmployerName");
+                postAddress = employingUnit.elementTextTrim("postAddress");
+                zipCode = employingUnit.elementTextTrim("zipCode");
+                contactPerson = employingUnit.elementTextTrim("contactPerson");
+                contactPhone = employingUnit.elementTextTrim("contactPhone");
+                monitorOrgCode = employingUnit.elementTextTrim("monitorOrgCode");
+                monitorOrgName = employingUnit.elementTextTrim("monitorOrgName");
+                remarks = employingUnit.elementTextTrim("remarks");
+                boolean empFlag = checkStringIsNull( employerCode,employerNameEN, areaStandard, areaAddress, economicCode, industryCateCode, enterpriseCode, postAddress, zipCode, contactPerson, contactPhone);
+                System.out.println("必填请求参数有空值:" + empFlag);
+                if (empFlag) {
+                    returnCode.setText("105");
+                    message.setText("必填请求参数有空值!");
+                    System.out.println("必填请求参数有空值!");
+                    System.out.println("必填请求参数有空值:" + retDoc.asXML());
+                    return retDoc.asXML();
+                }
+               //economicCode经济类型编码
+               List<CodeInfo>  economicCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(906));
+               boolean economicCodeflag=false;
+               for(CodeInfo codeInfo : economicCodeList){
+                   if(economicCode.equals(codeInfo.getCode())){
+                       economicCodeflag=true;
+                       break;
+                   }
+               }
+               if(!economicCodeflag){
+                   returnCode.setText("102");
+                   message.setText("无法找到经济类型编码!");
+                   System.out.println("无法找到经济类型编码!");
+                   System.out.println("无法找到经济类型编码:" + retDoc.asXML());
+                   return retDoc.asXML();
+               }
+               //enterpriseCode企业规模编码
+               List<CodeInfo>  enterpriseCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(905));
+               boolean enterpriseCodeflag=false;
+               for(CodeInfo codeInfo : enterpriseCodeList){
+                   if(enterpriseCode.equals(codeInfo.getCode())){
+                       enterpriseCodeflag=true;
+                       break;
+                   }
+               }
+               if(!enterpriseCodeflag){
+                   returnCode.setText("102");
+                   message.setText("无法找到企业规模编码!");
+                   System.out.println("无法找到企业规模编码!");
+                   System.out.println("无法找到企业规模编码:" + retDoc.asXML());
+                   return retDoc.asXML();
+               }
+                zybYrdw.setEmployerCode(employerCode);
+                zybYrdw.setEmployerName(employerNameEN);
+                zybYrdw.setEmployerDesc(employerDesc);
+                zybYrdw.setAreaStandard(Integer.valueOf(areaStandard));
+                zybYrdw.setAreaAddress(areaAddress);
+                zybYrdw.setEconomicCode(economicCode);
+                zybYrdw.setIndustryCateCode(Short.parseShort(industryCateCode));
+                zybYrdw.setEnterpriseCode(Short.parseShort(enterpriseCode));
+                if(!StringUtils.isEmpty(secondEmployerCode)){
+                    zybYrdw.setSecondEmployerCode(Long.parseLong(secondEmployerCode));
+                }
+                zybYrdw.setSecondEmployerName(secondEmployerName);
+                zybYrdw.setPostAddress(postAddress);
+                zybYrdw.setZipCode(Integer.valueOf(zipCode));
+                zybYrdw.setContactPerson(contactPerson);
+                zybYrdw.setContactPhone(Long.parseLong(contactPhone));
+                zybYrdw.setMonitorOrgCode(monitorOrgCode);
+                zybYrdw.setMonitorOrgName(monitorOrgName);
+                zybYrdw.setRemarks(remarks);
+                //获取当前系统时间
+               Date currentTime = new Date();
+               SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+               String dateString = formatter.format(currentTime);
+               Date currentDate = formatter.parse(dateString);
+               zybYrdw.setLogsj(currentDate);
+                System.out.println("系统时间"+dateString);
+                ZybYrdw zybYrdwBykey = zybYrdwServiceImpl.selectByPrimaryKey(employerCode);
+
+                if(zybYrdwBykey!=null){
+                    System.out.println("跟新用人单位数据");
+                    zybYrdwServiceImpl.updateByPrimaryKey(zybYrdw);
+                }else{
+                    System.out.println("插入用人单位数据");
+                    zybYrdwServiceImpl.insert(zybYrdw);
+                }
+            }
+
+            //格式校验 先不做校验
+            /*boolean formatFlag = isDateFormate(emtList, dataInfo);
             if (!formatFlag) {
                 System.out.println("数据格式或code不唯一有误:" + retDoc.asXML());
                 return retDoc.asXML();
-            }
+            }*/
 
-
-        } catch (DocumentException e) {
-            e.printStackTrace();
 
         } catch (Exception e) {
-            e.printStackTrace();
-
+            returnCode.setText("103");
+            message.setText("xml数据解析失败!");
+            System.out.println("xml数据解析失败:" + retDoc.asXML());
+            return retDoc.asXML();
         }
-        return SUCCED;
+        returnCode.setText("0");
+        message.setText("成功!");
+        System.out.println("成功:" + retDoc.asXML());
+        return retDoc.asXML();
     }
 
     //参数判空
     public boolean checkStringIsNull(String... value) {
         int count = 0;
-        System.out.println("value.length:" +value.length);
         for (int i = 0; i <  value.length; i++) {
             //遍历字符数组所有的参数，发现某个为 null 或者 "" ,则跳出
-            System.out.println("value[i]:" +value[0]);
             if (StringUtils.isEmpty(value[i])) {
                 return true;
             }
@@ -331,8 +891,8 @@ public class ReadStringXmlController {
         return true;
     }
 
-    //参数格式判断
-    private Boolean isDateFormate(List<BodyDataEntity> dateStr, Element dataInfo) {
+    //参数格式判断 暂时先不用 字段还没写完
+   /* private Boolean isDateFormate(List<BodyDataEntity> dateStr, Element dataInfo) {
 
         boolean flag = true;
         for (BodyDataEntity reportCard : dateStr) {
@@ -1565,22 +2125,16 @@ public class ReadStringXmlController {
         }
 
         return flag;
-    }
-    //数据唯一性校验
-    private Boolean isOnlyData(HashMap<String,String> hashMap){
+    }*/
+    //数据唯一性校验 暂时先不用校验
+    /*private Boolean isOnlyData(HashMap<String,String> hashMap){
         ZybGak zybGak = zybGakService.selectByCodeAndHosId(hashMap);
         if(zybGak==null){
             return true;
         }
         return false;
     }
-    //用人单位code和名称至少一项必填
-    private Boolean checkEmpStringIsNull(String orgCode,String employerName){
-        if(StringUtils.isEmpty(orgCode) && StringUtils.isEmpty(employerName)){
-           return true;
-        }
-        return false;
-    }
+
     //数字字母字符正则判断
     private  boolean isLetterDigit(String str) {
         String regex = "^[a-z0-9A-Z]+$";
@@ -1608,6 +2162,12 @@ public class ReadStringXmlController {
     private boolean isDouNot(String str){
         String regex ="^([1-9][0-9]*)+(.[0-9]{1,2})?$";
         return str.matches(regex);
+    }*/
+    //用人单位code和名称至少一项必填
+    private Boolean checkEmpStringIsNull(String orgCode,String employerName){
+        if(StringUtils.isEmpty(orgCode) && StringUtils.isEmpty(employerName)){
+            return true;
+        }
+        return false;
     }
-
 }
