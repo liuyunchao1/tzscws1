@@ -14,6 +14,8 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
 @Component
 public class ScheduleTask {
 
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     private ZybGakService zybGakService;
 
@@ -48,7 +52,7 @@ public class ScheduleTask {
     public void callProvincialPlatform() {
         List<ZybGak> list = zybGakService.selectForCallProvincial();    // 已审核，但未发送的数据
         if (CollectionUtils.isEmpty(list)) {
-            System.out.println("==========没有数据要上传============");
+            logger.info("==========没有数据要上传============");
             return;
         }
         for (ZybGak p : list) {
@@ -286,11 +290,14 @@ public class ScheduleTask {
             jsonConfig.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);
             JSONArray jsonArray = JSONArray.fromObject(resultJson, jsonConfig);
             Object result = jsonArray.get(0);
+            logger.info("begin=====调用上传省平台接口返回结果=====begin");
+            logger.info(result != null ? result.toString() : "");
+            logger.info("end=====调用上传省平台接口返回结果=====end");
 
             Map<String, Object> resultMap = parseXmlStr2Map(result != null ? result.toString() : "");   // 解析返回的结果
             updateData(list, resultMap);    // 根据省平台接口返回的结果，回写更新数据状态
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -339,7 +346,7 @@ public class ScheduleTask {
             }
             map.put("errorDataMap", errorDataMap);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return map;
     }
@@ -371,7 +378,7 @@ public class ScheduleTask {
         ZybGak updateObj;
         Date updateDate = new Date();
         if ("0".equals(returnCode)) { // 上传成功
-            System.out.println("==============上传成功=========");
+            logger.info("==============上传成功=========");
             for (ZybGak gak : list) {
                 updateObj = new ZybGak();
                 updateObj.setId(gak.getId());
@@ -385,7 +392,7 @@ public class ScheduleTask {
         // 上传失败时，更新状态和原因，如果某个案卡有单独返回的错误原因，则更新成此原因，如果没有，则更新成总的message
         String message = resultMap.get("message") != null ? resultMap.get("message").toString() : "";   // 错误说明
         Map<String, String> errorDataMap = resultMap.containsKey("errorDataMap") ? (Map<String, String>) resultMap.get("errorDataMap") : null;  // 每条个案卡数据的错误消息
-        System.out.println("==============失败=========");
+        logger.info("===========上传失败=========");
         for (ZybGak gak : list) {
             updateObj = new ZybGak();
             updateObj.setId(gak.getId());

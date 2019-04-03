@@ -4,9 +4,7 @@ package com.wondersgroup.tzscws1.verification;
 import com.wondersgroup.tzscws1.constant.Constant;
 import com.wondersgroup.tzscws1.entity.HeaderDataEntty;
 
-import com.sun.xml.internal.ws.util.StringUtils;
 import org.apache.commons.codec.binary.Base64;
-
 
 import java.security.MessageDigest;
 
@@ -34,7 +32,7 @@ public class Verification {
 
 
 
-    private String MD5(String s) {
+    public String MD5(String s) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] bytes = md.digest(s.getBytes("utf-8"));
