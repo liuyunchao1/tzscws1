@@ -10,7 +10,8 @@ import java.util.List;
 @Service
 public class ZybYrdwServiceImpl implements  ZybYrdwService{
     @Autowired
-    public ZybYrdwMapper zybYrdwMapper;
+    private ZybYrdwMapper zybYrdwMapper;
+
     @Override
     public List<ZybYrdw> selectByEmployerName(String employerName){
         return zybYrdwMapper.selectByEmployerName(employerName);
@@ -26,5 +27,10 @@ public class ZybYrdwServiceImpl implements  ZybYrdwService{
     @Override
     public int insert(ZybYrdw zybYrdw){
         return zybYrdwMapper.insert(zybYrdw);
+    }
+
+    @Override
+    public List<ZybYrdw> selectByIdList(List<String> idList) {
+        return zybYrdwMapper.selectByIdList(idList);
     }
 }

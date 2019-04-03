@@ -5,13 +5,14 @@ import com.wondersgroup.tzscws1.model.ZybGak;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
+import java.util.List;
 
 
 @Service
 public class ZybGakServiceImpl implements ZybGakService{
     @Autowired
     private  ZybGakMapper zybGakMapper;
-    @Override
+
     public  ZybGak selectByCodeAndHosId(HashMap<String,String> param){
         return zybGakMapper.selectByCodeAndHosId(param);
     }
@@ -23,5 +24,15 @@ public class ZybGakServiceImpl implements ZybGakService{
     }
     public  ZybGak selectByPrimaryKey(String param){
         return zybGakMapper.selectByPrimaryKey(param);
+    }
+
+    @Override
+    public List<ZybGak> selectForCallProvincial() {
+        return zybGakMapper.selectForCallProvincial();
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(ZybGak record) {
+        return zybGakMapper.updateByPrimaryKeySelective(record);
     }
 }
