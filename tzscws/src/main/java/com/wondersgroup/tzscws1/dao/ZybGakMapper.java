@@ -2,8 +2,8 @@ package com.wondersgroup.tzscws1.dao;
 
 import com.wondersgroup.tzscws1.model.ZybGak;
 import org.apache.ibatis.annotations.Mapper;
-
 import java.util.HashMap;
+import java.util.List;
 
 @Mapper
 public interface ZybGakMapper {
@@ -56,4 +56,10 @@ public interface ZybGakMapper {
     int updateByPrimaryKey(ZybGak record);
 
     ZybGak selectByCodeAndHosId(HashMap map);
+
+    /**
+     * 调用上传省平台接口查找数据
+     * @return
+     */
+    List<ZybGak> selectForCallProvincial();
 }

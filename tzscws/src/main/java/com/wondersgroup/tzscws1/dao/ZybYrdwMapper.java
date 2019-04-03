@@ -2,8 +2,8 @@ package com.wondersgroup.tzscws1.dao;
 
 import com.wondersgroup.tzscws1.model.ZybYrdw;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 
@@ -58,4 +58,11 @@ public interface ZybYrdwMapper {
     int updateByPrimaryKey(ZybYrdw record);
 
     List<ZybYrdw> selectByEmployerName(String employerName);
+
+    /**
+     * 根据id批量查找
+     * @param idList id列表
+     * @return
+     */
+    List<ZybYrdw> selectByIdList(@Param("idList") List<String> idList);
 }

@@ -7,9 +7,18 @@ import java.util.List;
 
 @Service
 public interface ZybYrdwService {
+
     public List<ZybYrdw> selectByEmployerName(String employerName);
     public ZybYrdw selectByPrimaryKey(String employerCode);
     public int updateByPrimaryKey(ZybYrdw zybYrdw);
     public int insert(ZybYrdw zybYrdw);
+
+
+    /**
+     * 根据id批量查找
+     * @param idList id列表
+     * @return
+     */
+    List<ZybYrdw> selectByIdList(List<String> idList);
 
 }
