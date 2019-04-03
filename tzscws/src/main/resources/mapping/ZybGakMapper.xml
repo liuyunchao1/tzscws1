@@ -1294,4 +1294,14 @@
       and CODE=#{code,jdbcType=VARCHAR}
       and HOS_ID=#{hosId,jdbcType=VARCHAR}
   </select>
+
+  <!-- 调用上传省平台接口查找数据 -->
+  <select id="selectForCallProvincial"  resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from ZYB_GAK
+    where SHBZ = 1 and (SBBZ is null or SBBZ != 1)
+    order by SBBZ desc nulls last, SHSJ desc nulls last
+  </select>
+
 </mapper>

@@ -323,4 +323,14 @@
       and EMPLOYER_NAME = #{employerName,jdbcType=VARCHAR},
     </if>
   </select>
+  <!-- 根据id批量查找 -->
+  <select id="selectByIdList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from ZYB_YRDW
+    where EMPLOYER_CODE in
+    <foreach collection="idList" item="item" index="index" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </select>
 </mapper>

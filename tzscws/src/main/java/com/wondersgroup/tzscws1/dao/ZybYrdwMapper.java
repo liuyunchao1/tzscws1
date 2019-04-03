@@ -2,8 +2,8 @@ package com.wondersgroup.tzscws1.dao;
 
 import com.wondersgroup.tzscws1.model.ZybYrdw;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 

@@ -10,12 +10,21 @@ import java.util.List;
 @Service
 public class ZybYrdwServiceImpl implements  ZybYrdwService{
     @Autowired
-    private ZybYrdwMapper zybYrdwMapper;
+    public ZybYrdwMapper zybYrdwMapper;
     @Override
     public List<ZybYrdw> selectByEmployerName(String employerName){
         return zybYrdwMapper.selectByEmployerName(employerName);
     }
+    @Override
     public ZybYrdw selectByPrimaryKey(String employerCode){
         return zybYrdwMapper.selectByPrimaryKey(employerCode);
+    }
+    @Override
+    public int updateByPrimaryKey(ZybYrdw zybYrdw){
+        return zybYrdwMapper.updateByPrimaryKey(zybYrdw);
+    }
+    @Override
+    public int insert(ZybYrdw zybYrdw){
+        return zybYrdwMapper.insert(zybYrdw);
     }
 }

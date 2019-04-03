@@ -13,8 +13,15 @@ public class ZybGakServiceImpl implements ZybGakService{
     private  ZybGakMapper zybGakMapper;
     @Override
     public  ZybGak selectByCodeAndHosId(HashMap<String,String> param){
-        System.out.println("code:" +param.get("code"));
-        System.out.println("hosId:" +param.get("hosId"));
         return zybGakMapper.selectByCodeAndHosId(param);
+    }
+    public int insert(ZybGak zybGak){
+        return zybGakMapper.insert(zybGak);
+    }
+    public int updateByPrimaryKey(ZybGak zybGak){
+        return zybGakMapper.updateByPrimaryKey(zybGak);
+    }
+    public  ZybGak selectByPrimaryKey(String param){
+        return zybGakMapper.selectByPrimaryKey(param);
     }
 }
