@@ -5,6 +5,7 @@ import com.wondersgroup.tzscws1.model.ZybGak;
 import com.wondersgroup.tzscws1.model.ZybYrdw;
 import com.wondersgroup.tzscws1.service.ZybGakService;
 import com.wondersgroup.tzscws1.service.ZybYrdwService;
+import com.wondersgroup.tzscws1.util.CommonUtils;
 import com.wondersgroup.tzscws1.util.SoapWebServiceClient;
 import com.wondersgroup.tzscws1.verification.Verification;
 import net.sf.json.JSONArray;
@@ -113,35 +114,26 @@ public class ScheduleTask {
                 return;
             }
 
-            // 批量查找企业信息
-            List<String> employerCodeList = new ArrayList<>();  // 所有的企业id
-            for (ZybGak p : list) {
-                if (!StringUtils.isEmpty(p.getOrgCode())) {
-                    employerCodeList.add(p.getOrgCode());
-                }
-            }
-            List<ZybYrdw> employerList = zybYrdwService.selectByIdList(employerCodeList);
-//            Map<String, ZybYrdw> employerMap = employerList.stream().collect(Collectors.toMap(ZybYrdw :: getEmployerCode, p -> p, (k1, k2) -> k2));
-            Map<String, ZybYrdw> employerMap = new HashMap<>();
-            for (ZybYrdw p : employerList) {
-                employerMap.put(p.getEmployerCode(), p);
-            }
+            // 批量获取企业信息
+            Map<String, Map<String, ZybYrdw>> employerMap = batchGetEmployerMap(list);
+            Map<String, ZybYrdw> idMap = employerMap.get("idMap");
+            Map<String, ZybYrdw> nameMap = employerMap.get("nameMap");
 
             StringBuilder strXml = new StringBuilder();
             StringBuilder bodyStr = new StringBuilder();    //body标签另外做一个字符串用于加签
             StringBuilder employingStr = new StringBuilder();  //企业基本信息
             String eventId = "test";//业务请求类型编码  test免验证用于测试
             String hosId = list.get(0).getHosId();//医院编码
-            Date date = new Date();
+            String dateStr = CommonUtils.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss");
             Verification verification = new Verification();
-            String headSign = verification.MD5(eventId + date + hosId + Constant.PASSORD);//用户秘钥
+            String headSign = verification.MD5(eventId + dateStr + hosId + Constant.PASSORD);//用户秘钥
             String bodySign = "";//数据签名
             strXml.append("<data><header><eventId>");
             strXml.append(eventId);
             strXml.append("</eventId><hosId>");
             strXml.append(hosId);
             strXml.append("</hosId><requestTime>");
-            strXml.append(date);
+            strXml.append(dateStr);
             strXml.append("</requestTime><headSign>");
             strXml.append(headSign);
             strXml.append("</headSign><bodySign>");
@@ -152,129 +144,135 @@ public class ScheduleTask {
             ZybYrdw zybYrdw;    // 单个企业信息
             for (ZybGak gak : list) {
                 bodyStr.append("<reportCard>")
-                        .append("<code>").append(gak.getCode()).append("</code><hosId>")
-                        .append(gak.getHosId()).append("</hosId><name>")
-                        .append(gak.getName()).append("</name><idcard>")
-                        .append(gak.getIdcard()).append("</idcard><bodyCheckType>")
-                        .append(gak.getBodyCheckType()).append("</bodyCheckType><sexCode>")
-                        .append(gak.getSexCode()).append("</sexCode><birthday>")
-                        .append(gak.getBirthday()).append("</birthday><hazardCode>")
-                        .append(gak.getHazardCode()).append("</hazardCode><hazardYear>")
-                        .append(gak.getHazardYear()).append("</hazardYear><hazardMonth>")
-                        .append(gak.getHazardMonth()).append("</hazardMonth><sysPressResult>")
-                        .append(gak.getSysPressResult()).append("</sysPressResult><orgCode>")
-                        .append(gak.getOrgCode()).append("</orgCode><employerName>")
-                        .append(gak.getEmployerName()).append("</employerName><telPhone>")
-                        .append(gak.getTelPhone()).append("</telPhone><seniorityYear>")
-                        .append(gak.getSeniorityYear()).append("</seniorityYear><seniorityMonth>")
-                        .append(gak.getSeniorityMonth()).append("</seniorityMonth><exposureYear>")
-                        .append(gak.getExposureYear()).append("</exposureYear><exposureMonth>")
-                        .append(gak.getExposureMonth()).append("</exposureMonth><workShop>")
-                        .append(gak.getWorkShop()).append("</workShop><jobCode>")
-                        .append(gak.getJobCode()).append("</jobCode><sysPressUnitName>")
-                        .append(gak.getSysPressUnitName()).append("</sysPressUnitName><diasPressResult>")
-                        .append(gak.getDiasPressResult()).append("</diasPressResult><diasPressUnitName>")
-                        .append(gak.getDiasPressUnitName()).append("</diasPressUnitName><wbcResult>")
-                        .append(gak.getWbcResult()).append("</wbcResult><wbcUnitName>")
-                        .append(gak.getWbcUnitName()).append("</wbcUnitName><wbcMiniRange>")
-                        .append(gak.getWbcMiniRange()).append("</wbcMiniRange><wbcMaxRange>")
-                        .append(gak.getWbcMaxRange()).append("</wbcMaxRange><rbcResult>")
-                        .append(gak.getRbcResult()).append("</rbcResult><rbcUnitName>")
-                        .append(gak.getRbcUnitName()).append("</rbcUnitName><rbcMiniRange>")
-                        .append(gak.getRbcMiniRange()).append("</rbcMiniRange><rbcMaxRange>")
-                        .append(gak.getRbcMaxRange()).append("</rbcMaxRange><hbResult>")
-                        .append(gak.getHbResult()).append("</hbResult><hbUnitName>")
-                        .append(gak.getHbUnitName()).append("</hbUnitName><hbMiniRange>")
-                        .append(gak.getHbMiniRange()).append("</hbMiniRange><hbMaxRange>")
-                        .append(gak.getHbMaxRange()).append("</hbMaxRange><pltResult>")
-                        .append(gak.getPltResult()).append("</pltResult><pltUnitName>")
-                        .append(gak.getPltUnitName()).append("</pltUnitName><pltMiniRange>")
-                        .append(gak.getPltMiniRange()).append("</pltMiniRange><pltMaxRange>")
-                        .append(gak.getPltMaxRange()).append("</pltMaxRange><gluResult>")
-                        .append(gak.getGluResult()).append("</gluResult><gluUnitName>")
-                        .append(gak.getGluUnitName()).append("</gluUnitName><gluMiniRange>")
-                        .append(gak.getGluMiniRange()).append("</gluMiniRange><gluMaxRange>")
-                        .append(gak.getGluMaxRange()).append("</gluMaxRange><proResult>")
-                        .append(gak.getProResult()).append("</proResult><proUnitName>")
-                        .append(gak.getProUnitName()).append("</proUnitName><proMiniRange>")
-                        .append(gak.getProMiniRange()).append("</proMiniRange><proMaxRange>")
-                        .append(gak.getProMaxRange()).append("</proMaxRange><uwbcResult>")
-                        .append(gak.getUwbcResult()).append("</uwbcResult><uwbcUnitName>")
-                        .append(gak.getUwbcUnitName()).append("</uwbcUnitName><uwbcMiniRange>")
-                        .append(gak.getUwbcMiniRange()).append("</uwbcMiniRange><uwbcMaxRange>")
-                        .append(gak.getUwbcMaxRange()).append("</uwbcMaxRange><bldResult>")
-                        .append(gak.getBldResult()).append("</bldResult><bldUnitName>")
-                        .append(gak.getBldUnitName()).append("</bldUnitName><bldMiniRange>")
-                        .append(gak.getBldMiniRange()).append("</bldMiniRange><bldMaxRange>")
-                        .append(gak.getBldMaxRange()).append("</bldMaxRange><altResult>")
-                        .append(gak.getAltResult()).append("</altResult><altUnitName>")
-                        .append(gak.getAltUnitName()).append("</altUnitName><altMiniRange>")
-                        .append(gak.getAltMiniRange()).append("</altMiniRange><altMaxRange>")
-                        .append(gak.getAltMaxRange()).append("</altMaxRange><ecgCode>")
-                        .append(gak.getEcgCode()).append("</ecgCode><chestCode>")
-                        .append(gak.getChestCode()).append("</chestCode><fvcResult>")
-                        .append(gak.getFvcResult()).append("</fvcResult><fvcUnitName>")
-                        .append(gak.getFvcUnitName()).append("</fvcUnitName><fvcMiniRange>")
-                        .append(gak.getFvcMiniRange()).append("</fvcMiniRange><fvcMaxRange>")
-                        .append(gak.getFvcMaxRange()).append("</fvcMaxRange><fev1Result>")
-                        .append(gak.getFev1Result()).append("</fev1Result><fev1UnitName>")
-                        .append(gak.getFev1UnitName()).append("</fev1UnitName><fev1MiniRange>")
-                        .append(gak.getFev1MiniRange()).append("</fev1MiniRange><fev1MaxRange>")
-                        .append(gak.getFev1MaxRange()).append("</fev1MaxRange><fev1fvcResult>")
-                        .append(gak.getFev1fvcResult()).append("</fev1fvcResult><fev1fvcUnitName>")
-                        .append(gak.getFev1fvcUnitName()).append("</fev1fvcUnitName><fev1fvcMiniRange>")
-                        .append(gak.getFev1fvcMiniRange()).append("</fev1fvcMiniRange><fev1fvcMaxRange>")
-                        .append(gak.getFev1fvcMaxRange()).append("</fev1fvcMaxRange><bLeadResult>")
-                        .append(gak.getbLeadResult()).append("</bLeadResult><bLeadUnitName>")
-                        .append(gak.getbLeadUnitName()).append("</bLeadUnitName><bLeadMiniRange>")
-                        .append(gak.getbLeadMiniRange()).append("</bLeadMiniRange><bLeadMaxRange>")
-                        .append(gak.getbLeadMaxRange()).append("</bLeadMaxRange><uLeadResult>")
-                        .append(gak.getuLeadResult()).append("</uLeadResult><uLeadUnitName>")
-                        .append(gak.getuLeadUnitName()).append("</uLeadUnitName><uLeadMiniRange>")
-                        .append(gak.getuLeadMiniRange()).append("</uLeadMiniRange><uLeadMaxRange>")
-                        .append(gak.getuLeadMaxRange()).append("</uLeadMaxRange><zppResult>")
-                        .append(gak.getZppResult()).append("</zppResult><zppUnitName>")
-                        .append(gak.getZppUnitName()).append("</zppUnitName><zppMiniRange>")
-                        .append(gak.getZppMiniRange()).append("</zppMiniRange><zppMaxRange>")
-                        .append(gak.getZppMaxRange()).append("</zppMaxRange><neutResult>")
-                        .append(gak.getNeutResult()).append("</neutResult><neutUnitName>")
-                        .append(gak.getNeutUnitName()).append("</neutUnitName><neutMiniRange>")
-                        .append(gak.getNeutMiniRange()).append("</neutMiniRange><neutMaxRange>")
-                        .append(gak.getNeutMaxRange()).append("</neutMaxRange><hearingReuslt>")
-                        .append(gak.getHearingReuslt()).append("</hearingReuslt><hearingUnitName>")
-                        .append(gak.getHearingUnitName()).append("</hearingUnitName><hearingMiniRange>")
-                        .append(gak.getHearingMiniRange()).append("</hearingMiniRange><hearingMaxRange>")
-                        .append(gak.getHearingMaxRange()).append("</hearingMaxRange><rpbtCode>")
-                        .append(gak.getRpbtCode()).append("</rpbtCode><wrightCode>")
-                        .append(gak.getWrightCode()).append("</wrightCode><conclusionsCode>")
-                        .append(gak.getConclusionsCode()).append("</conclusionsCode>")
+                        .append("<code>").append(CommonUtils.getString(gak.getCode())).append("</code><hosId>")
+                        .append(CommonUtils.getString(gak.getHosId())).append("</hosId><name>")
+                        .append(CommonUtils.getString(gak.getName())).append("</name><idcard>")
+                        .append(CommonUtils.getString(gak.getIdcard())).append("</idcard><bodyCheckType>")
+                        .append(CommonUtils.getString(gak.getBodyCheckType())).append("</bodyCheckType><sexCode>")
+                        .append(CommonUtils.getString(gak.getSexCode())).append("</sexCode><birthday>")
+                        .append(CommonUtils.getString(CommonUtils.formatDate(gak.getBirthday(), "yyyy-MM-dd"))).append("</birthday><hazardCode>")
+                        .append(CommonUtils.getString(gak.getHazardCode())).append("</hazardCode><hazardYear>")
+                        .append(CommonUtils.getString(gak.getHazardYear())).append("</hazardYear><hazardMonth>")
+                        .append(CommonUtils.getString(gak.getHazardMonth())).append("</hazardMonth><sysPressResult>")
+                        .append(CommonUtils.getString(gak.getSysPressResult())).append("</sysPressResult><orgCode>")
+                        .append(CommonUtils.getString(gak.getOrgCode())).append("</orgCode><employerName>")
+                        .append(CommonUtils.getString(gak.getEmployerName())).append("</employerName><telPhone>")
+                        .append(CommonUtils.getString(gak.getTelPhone())).append("</telPhone><seniorityYear>")
+                        .append(CommonUtils.getString(gak.getSeniorityYear())).append("</seniorityYear><seniorityMonth>")
+                        .append(CommonUtils.getString(gak.getSeniorityMonth())).append("</seniorityMonth><exposureYear>")
+                        .append(CommonUtils.getString(gak.getExposureYear())).append("</exposureYear><exposureMonth>")
+                        .append(CommonUtils.getString(gak.getExposureMonth())).append("</exposureMonth><workShop>")
+                        .append(CommonUtils.getString(gak.getWorkShop())).append("</workShop><jobCode>")
+                        .append(CommonUtils.getString(gak.getJobCode())).append("</jobCode><sysPressUnitName>")
+                        .append(CommonUtils.getString(gak.getSysPressUnitName())).append("</sysPressUnitName><diasPressResult>")
+                        .append(CommonUtils.getString(gak.getDiasPressResult())).append("</diasPressResult><diasPressUnitName>")
+                        .append(CommonUtils.getString(gak.getDiasPressUnitName())).append("</diasPressUnitName><wbcResult>")
+                        .append(CommonUtils.getString(gak.getWbcResult())).append("</wbcResult><wbcUnitName>")
+                        .append(CommonUtils.getString(gak.getWbcUnitName())).append("</wbcUnitName><wbcMiniRange>")
+                        .append(CommonUtils.getString(gak.getWbcMiniRange())).append("</wbcMiniRange><wbcMaxRange>")
+                        .append(CommonUtils.getString(gak.getWbcMaxRange())).append("</wbcMaxRange><rbcResult>")
+                        .append(CommonUtils.getString(gak.getRbcResult())).append("</rbcResult><rbcUnitName>")
+                        .append(CommonUtils.getString(gak.getRbcUnitName())).append("</rbcUnitName><rbcMiniRange>")
+                        .append(CommonUtils.getString(gak.getRbcMiniRange())).append("</rbcMiniRange><rbcMaxRange>")
+                        .append(CommonUtils.getString(gak.getRbcMaxRange())).append("</rbcMaxRange><hbResult>")
+                        .append(CommonUtils.getString(gak.getHbResult())).append("</hbResult><hbUnitName>")
+                        .append(CommonUtils.getString(gak.getHbUnitName())).append("</hbUnitName><hbMiniRange>")
+                        .append(CommonUtils.getString(gak.getHbMiniRange())).append("</hbMiniRange><hbMaxRange>")
+                        .append(CommonUtils.getString(gak.getHbMaxRange())).append("</hbMaxRange><pltResult>")
+                        .append(CommonUtils.getString(gak.getPltResult())).append("</pltResult><pltUnitName>")
+                        .append(CommonUtils.getString(gak.getPltUnitName())).append("</pltUnitName><pltMiniRange>")
+                        .append(CommonUtils.getString(gak.getPltMiniRange())).append("</pltMiniRange><pltMaxRange>")
+                        .append(CommonUtils.getString(gak.getPltMaxRange())).append("</pltMaxRange><gluResult>")
+                        .append(CommonUtils.getString(gak.getGluResult())).append("</gluResult><gluUnitName>")
+                        .append(CommonUtils.getString(gak.getGluUnitName())).append("</gluUnitName><gluMiniRange>")
+                        .append(CommonUtils.getString(gak.getGluMiniRange())).append("</gluMiniRange><gluMaxRange>")
+                        .append(CommonUtils.getString(gak.getGluMaxRange())).append("</gluMaxRange><proResult>")
+                        .append(CommonUtils.getString(gak.getProResult())).append("</proResult><proUnitName>")
+                        .append(CommonUtils.getString(gak.getProUnitName())).append("</proUnitName><proMiniRange>")
+                        .append(CommonUtils.getString(gak.getProMiniRange())).append("</proMiniRange><proMaxRange>")
+                        .append(CommonUtils.getString(gak.getProMaxRange())).append("</proMaxRange><uwbcResult>")
+                        .append(CommonUtils.getString(gak.getUwbcResult())).append("</uwbcResult><uwbcUnitName>")
+                        .append(CommonUtils.getString(gak.getUwbcUnitName())).append("</uwbcUnitName><uwbcMiniRange>")
+                        .append(CommonUtils.getString(gak.getUwbcMiniRange())).append("</uwbcMiniRange><uwbcMaxRange>")
+                        .append(CommonUtils.getString(gak.getUwbcMaxRange())).append("</uwbcMaxRange><bldResult>")
+                        .append(CommonUtils.getString(gak.getBldResult())).append("</bldResult><bldUnitName>")
+                        .append(CommonUtils.getString(gak.getBldUnitName())).append("</bldUnitName><bldMiniRange>")
+                        .append(CommonUtils.getString(gak.getBldMiniRange())).append("</bldMiniRange><bldMaxRange>")
+                        .append(CommonUtils.getString(gak.getBldMaxRange())).append("</bldMaxRange><altResult>")
+                        .append(CommonUtils.getString(gak.getAltResult())).append("</altResult><altUnitName>")
+                        .append(CommonUtils.getString(gak.getAltUnitName())).append("</altUnitName><altMiniRange>")
+                        .append(CommonUtils.getString(gak.getAltMiniRange())).append("</altMiniRange><altMaxRange>")
+                        .append(CommonUtils.getString(gak.getAltMaxRange())).append("</altMaxRange><ecgCode>")
+                        .append(CommonUtils.getString(gak.getEcgCode())).append("</ecgCode><chestCode>")
+                        .append(CommonUtils.getString(gak.getChestCode())).append("</chestCode><fvcResult>")
+                        .append(CommonUtils.getString(gak.getFvcResult())).append("</fvcResult><fvcUnitName>")
+                        .append(CommonUtils.getString(gak.getFvcUnitName())).append("</fvcUnitName><fvcMiniRange>")
+                        .append(CommonUtils.getString(gak.getFvcMiniRange())).append("</fvcMiniRange><fvcMaxRange>")
+                        .append(CommonUtils.getString(gak.getFvcMaxRange())).append("</fvcMaxRange><fev1Result>")
+                        .append(CommonUtils.getString(gak.getFev1Result())).append("</fev1Result><fev1UnitName>")
+                        .append(CommonUtils.getString(gak.getFev1UnitName())).append("</fev1UnitName><fev1MiniRange>")
+                        .append(CommonUtils.getString(gak.getFev1MiniRange())).append("</fev1MiniRange><fev1MaxRange>")
+                        .append(CommonUtils.getString(gak.getFev1MaxRange())).append("</fev1MaxRange><fev1fvcResult>")
+                        .append(CommonUtils.getString(gak.getFev1fvcResult())).append("</fev1fvcResult><fev1fvcUnitName>")
+                        .append(CommonUtils.getString(gak.getFev1fvcUnitName())).append("</fev1fvcUnitName><fev1fvcMiniRange>")
+                        .append(CommonUtils.getString(gak.getFev1fvcMiniRange())).append("</fev1fvcMiniRange><fev1fvcMaxRange>")
+                        .append(CommonUtils.getString(gak.getFev1fvcMaxRange())).append("</fev1fvcMaxRange><bLeadResult>")
+                        .append(CommonUtils.getString(gak.getbLeadResult())).append("</bLeadResult><bLeadUnitName>")
+                        .append(CommonUtils.getString(gak.getbLeadUnitName())).append("</bLeadUnitName><bLeadMiniRange>")
+                        .append(CommonUtils.getString(gak.getbLeadMiniRange())).append("</bLeadMiniRange><bLeadMaxRange>")
+                        .append(CommonUtils.getString(gak.getbLeadMaxRange())).append("</bLeadMaxRange><uLeadResult>")
+                        .append(CommonUtils.getString(gak.getuLeadResult())).append("</uLeadResult><uLeadUnitName>")
+                        .append(CommonUtils.getString(gak.getuLeadUnitName())).append("</uLeadUnitName><uLeadMiniRange>")
+                        .append(CommonUtils.getString(gak.getuLeadMiniRange())).append("</uLeadMiniRange><uLeadMaxRange>")
+                        .append(CommonUtils.getString(gak.getuLeadMaxRange())).append("</uLeadMaxRange><zppResult>")
+                        .append(CommonUtils.getString(gak.getZppResult())).append("</zppResult><zppUnitName>")
+                        .append(CommonUtils.getString(gak.getZppUnitName())).append("</zppUnitName><zppMiniRange>")
+                        .append(CommonUtils.getString(gak.getZppMiniRange())).append("</zppMiniRange><zppMaxRange>")
+                        .append(CommonUtils.getString(gak.getZppMaxRange())).append("</zppMaxRange><neutResult>")
+                        .append(CommonUtils.getString(gak.getNeutResult())).append("</neutResult><neutUnitName>")
+                        .append(CommonUtils.getString(gak.getNeutUnitName())).append("</neutUnitName><neutMiniRange>")
+                        .append(CommonUtils.getString(gak.getNeutMiniRange())).append("</neutMiniRange><neutMaxRange>")
+                        .append(CommonUtils.getString(gak.getNeutMaxRange())).append("</neutMaxRange><hearingReuslt>")
+                        .append(CommonUtils.getString(gak.getHearingReuslt())).append("</hearingReuslt><hearingUnitName>")
+                        .append(CommonUtils.getString(gak.getHearingUnitName())).append("</hearingUnitName><hearingMiniRange>")
+                        .append(CommonUtils.getString(gak.getHearingMiniRange())).append("</hearingMiniRange><hearingMaxRange>")
+                        .append(CommonUtils.getString(gak.getHearingMaxRange())).append("</hearingMaxRange><rpbtCode>")
+                        .append(CommonUtils.getString(gak.getRpbtCode())).append("</rpbtCode><wrightCode>")
+                        .append(CommonUtils.getString(gak.getWrightCode())).append("</wrightCode><conclusionsCode>")
+                        .append(CommonUtils.getString(gak.getConclusionsCode())).append("</conclusionsCode>")
                         .append("</reportCard>");
 
                 //查询企业信息
-                zybYrdw = (employerMap != null && employerMap.containsKey(gak.getOrgCode())) ? employerMap.get(gak.getOrgCode()) : null;
+                if (!StringUtils.isEmpty(CommonUtils.getString(gak.getOrgCode()))) {    // 有编号则按编号查，无编号再按名称查
+                    zybYrdw = idMap.get(CommonUtils.getString(gak.getOrgCode()));
+                } else if (!StringUtils.isEmpty(CommonUtils.getString(gak.getEmployerName()))) {
+                    zybYrdw = nameMap.get(CommonUtils.getString(gak.getEmployerName()));
+                } else {
+                    zybYrdw = null;
+                }
+
                 if (zybYrdw != null) {
                     employingStr.append("<employingUnit><employerCode>")
-                            .append(zybYrdw.getEmployerCode()).append("</employerCode><employerName>")
-                            .append(zybYrdw.getEmployerName()).append("</employerName><employerDesc>")
-                            .append(zybYrdw.getEmployerDesc()).append("</employerDesc><areaStandard>")
-                            .append(zybYrdw.getAreaStandard()).append("</areaStandard><areaAddress>")
-                            .append(zybYrdw.getAreaAddress()).append("</areaAddress><economicCode>")
-                            .append(zybYrdw.getEconomicCode()).append("</economicCode><industryCateCode>")
-                            .append(zybYrdw.getIndustryCateCode()).append("</industryCateCode><enterpriseCode>")
-                            .append(zybYrdw.getEnterpriseCode()).append("</enterpriseCode><secondEmployerCode>")
-                            .append(zybYrdw.getSecondEmployerCode()).append("</secondEmployerCode><secondEmployerName>")
-                            .append(zybYrdw.getSecondEmployerName()).append("</secondEmployerName><postAddress>")
-                            .append(zybYrdw.getPostAddress()).append("</postAddress><zipCode>")
-                            .append(zybYrdw.getZipCode()).append("</zipCode><contactPerson>")
-                            .append(zybYrdw.getContactPerson()).append("</contactPerson><contactPhone>")
-                            .append(zybYrdw.getContactPhone()).append("</contactPhone><monitorOrgCode>")
-                            .append(zybYrdw.getMonitorOrgCode()).append("</monitorOrgCode><monitorOrgName>")
-                            .append(zybYrdw.getMonitorOrgName()).append("</monitorOrgName><remarks>")
-                            .append(zybYrdw.getRemarks()).append("</remarks><sbbz>")
-                            .append(zybYrdw.getSbbz()).append("</sbbz><sbyy>")
-                            .append(zybYrdw.getSbyy()).append("</sbyy><sbsj>")
-                            .append(zybYrdw.getSbsj()).append("</sbsj><logsj>")
-                            .append(zybYrdw.getLogsj()).append("</logsj>").append("</employingUnit>");
+                            .append(CommonUtils.getString(zybYrdw.getEmployerCode())).append("</employerCode><employerName>")
+                            .append(CommonUtils.getString(zybYrdw.getEmployerName())).append("</employerName><employerDesc>")
+                            .append(CommonUtils.getString(zybYrdw.getEmployerDesc())).append("</employerDesc><areaStandard>")
+                            .append(CommonUtils.getString(zybYrdw.getAreaStandard())).append("</areaStandard><areaAddress>")
+                            .append(CommonUtils.getString(zybYrdw.getAreaAddress())).append("</areaAddress><economicCode>")
+                            .append(CommonUtils.getString(zybYrdw.getEconomicCode())).append("</economicCode><industryCateCode>")
+                            .append(CommonUtils.getString(zybYrdw.getIndustryCateCode())).append("</industryCateCode><enterpriseCode>")
+                            .append(CommonUtils.getString(zybYrdw.getEnterpriseCode())).append("</enterpriseCode><secondEmployerCode>")
+                            .append(CommonUtils.getString(zybYrdw.getSecondEmployerCode())).append("</secondEmployerCode><secondEmployerName>")
+                            .append(CommonUtils.getString(zybYrdw.getSecondEmployerName())).append("</secondEmployerName><postAddress>")
+                            .append(CommonUtils.getString(zybYrdw.getPostAddress())).append("</postAddress><zipCode>")
+                            .append(CommonUtils.getString(zybYrdw.getZipCode())).append("</zipCode><contactPerson>")
+                            .append(CommonUtils.getString(zybYrdw.getContactPerson())).append("</contactPerson><contactPhone>")
+                            .append(CommonUtils.getString(zybYrdw.getContactPhone())).append("</contactPhone><monitorOrgCode>")
+                            .append(CommonUtils.getString(zybYrdw.getMonitorOrgCode())).append("</monitorOrgCode><monitorOrgName>")
+                            .append(CommonUtils.getString(zybYrdw.getMonitorOrgName())).append("</monitorOrgName><remarks>")
+                            .append(CommonUtils.getString(zybYrdw.getRemarks())).append("</remarks><sbbz>")
+                            .append(CommonUtils.getString(zybYrdw.getSbbz())).append("</sbbz><sbyy>")
+                            .append(CommonUtils.getString(zybYrdw.getSbyy())).append("</sbyy><sbsj>")
+                            .append(CommonUtils.getString(zybYrdw.getSbsj())).append("</sbsj>").append("</employingUnit>");
                 }
             }
             bodyStr.append("</reportCards><employingUnits>").append(employingStr).append("</employingUnits></body>");
@@ -299,6 +297,54 @@ public class ScheduleTask {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * 批量查找企业信息
+     * @param list 个人案卡列表
+     */
+    private Map<String, Map<String, ZybYrdw>> batchGetEmployerMap(List<ZybGak> list) {
+        Map<String, ZybYrdw> idMap = new HashMap<>();
+        Map<String, ZybYrdw> nameMap = new HashMap<>();
+        Map<String, Map<String, ZybYrdw>> resultMap = new HashMap<>();
+        resultMap.put("idMap", idMap);
+        resultMap.put("nameMap", nameMap);
+        if (CollectionUtils.isEmpty(list)) {
+            return resultMap;
+        }
+
+        // 批量查找企业信息
+        List<String> employerCodeList = new ArrayList<>();  // 所有的企业id
+        List<String> employerNameList = new ArrayList<>();  // 所有的企业名称
+        for (ZybGak p : list) {
+            if (!StringUtils.isEmpty(p.getOrgCode())) {
+                employerCodeList.add(p.getOrgCode());
+            } else if (!StringUtils.isEmpty(p.getEmployerName())) {
+                employerNameList.add(p.getEmployerName());
+            }
+        }
+        List<ZybYrdw> employerList1 = null;
+        if (!CollectionUtils.isEmpty(employerCodeList)) {
+            employerList1 = zybYrdwService.selectByIdList(employerCodeList);
+        }
+        List<ZybYrdw> employerList2 = null;
+        if (!CollectionUtils.isEmpty(employerNameList)) {
+            employerList2 = zybYrdwService.selectByNameList(employerNameList);
+        }
+
+//            Map<String, ZybYrdw> employerMap = employerList.stream().collect(Collectors.toMap(ZybYrdw :: getEmployerCode, p -> p, (k1, k2) -> k2));
+        if (!CollectionUtils.isEmpty(employerList1)) {
+            for (ZybYrdw p : employerList1) {
+                idMap.put(p.getEmployerCode(), p);
+            }
+        }
+        if (!CollectionUtils.isEmpty(employerList2)) {
+            for (ZybYrdw p : employerList2) {
+                nameMap.put(p.getEmployerName(), p);
+            }
+        }
+
+        return resultMap;
     }
 
     /**

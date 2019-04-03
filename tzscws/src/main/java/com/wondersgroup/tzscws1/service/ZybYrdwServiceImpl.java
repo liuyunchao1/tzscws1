@@ -33,4 +33,9 @@ public class ZybYrdwServiceImpl implements  ZybYrdwService{
     public List<ZybYrdw> selectByIdList(List<String> idList) {
         return zybYrdwMapper.selectByIdList(idList);
     }
+
+    @Override
+    public List<ZybYrdw> selectByNameList(List<String> nameList) {
+        return zybYrdwMapper.selectByNameList(nameList);
+    }
 }

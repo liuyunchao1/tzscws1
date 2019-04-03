@@ -12,6 +12,8 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,8 @@ import java.util.*;
 @RestController
 @RequestMapping(value = "/tzscws")
 public class ReadStringXmlController {
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
     /**
      * 测试解析xml字符串
      *
@@ -137,14 +141,14 @@ public class ReadStringXmlController {
             // 下面的是通过解析xml字符串的new String(text.getBytes("gbk")，"utf-8");
             doc = DocumentHelper.parseText(xml); // 将字符串转为XML
             Element rootElt = doc.getRootElement(); // 获取根节点
-            System.out.println("根节点：" + rootElt.getName()); // 拿到根节点的名称
+            logger.info("根节点：" + rootElt.getName()); // 拿到根节点的名称
             Iterator iter = rootElt.elementIterator("header"); // 获取根节点下的子节点header
 
             // 遍历header节点
             while (iter.hasNext()) {
                 Element recordEle = (Element) iter.next();
                 String nodeName = recordEle.getName();
-                System.out.println(nodeName);
+                logger.info(nodeName);
 //               String title = recordEle.elementTextTrim("title"); // 拿到head节点下的子节点title值
                 Iterator iters = recordEle.elementIterator();// 拿到head节点下的所有子节点值
                 while (iters.hasNext()) {
@@ -183,7 +187,7 @@ public class ReadStringXmlController {
     @RequestMapping(value="/dataExchange",method = RequestMethod.POST)
     public String reportZybData(String xml) {
         //返回xml格式字符串
-        System.out.println(xml);
+        logger.info(xml);
         Document retDoc = DocumentHelper.createDocument();
         retDoc.setXMLEncoding("UTF-8");
         Element dataInfo = retDoc.addElement("data");
@@ -192,7 +196,7 @@ public class ReadStringXmlController {
         if(StringUtils.isEmpty(xml)){
             returnCode.setText("105");
             message.setText("请求参数为空!");
-            System.out.println("请求参数为空!");
+            logger.info("请求参数为空!");
             return retDoc.toString();
         }
         HeaderDataEntty headerDatas = readStringHeader(xml);
@@ -200,12 +204,12 @@ public class ReadStringXmlController {
         if (headerDatas != null) {
             Verification verification = new Verification();
             flag = verification.verHeadSign(headerDatas);
-            System.out.println(flag);
+            logger.info(flag + "");
         }
         if (flag) {
             returnCode.setText("201");
             message.setText("秘钥校验错误!");
-            System.out.println("秘钥校验错误!");
+            logger.info("秘钥校验错误!");
             return retDoc.toString();
         }
         Document doc = null;
@@ -215,14 +219,14 @@ public class ReadStringXmlController {
             // 下面的是通过解析xml字符串的
             doc = DocumentHelper.parseText(xml); // 将字符串转为XML
             Element rootElt = doc.getRootElement(); // 获取根节点
-            System.out.println("根节点：" + rootElt.getName()); // 拿到根节点的名称
+            logger.info("根节点：" + rootElt.getName()); // 拿到根节点的名称
 //          Iterator iterss = rootElt.elementIterator("Elt"); ///获取根节点下的子节点body
             Element bodyElt = rootElt.element("body");
-            System.out.println("bodyElt：" + bodyElt.getName()); // 拿到根节点的名称
+            logger.info("bodyElt：" + bodyElt.getName()); // 拿到根节点的名称
             Element reportCardsElt = bodyElt.element("reportCards");
             Iterator iterss = reportCardsElt.elementIterator("reportCard");
             Element employingUnits = bodyElt.element("employingUnits");
-            System.out.println("bodyElt：" + employingUnits.getName()); // 拿到根节点的名称
+            logger.info("bodyElt：" + employingUnits.getName()); // 拿到根节点的名称
             Iterator employingUnitIte = employingUnits.elementIterator("employingUnit");
             // 遍历reportCard节点
              String codeResult = "";
@@ -424,8 +428,8 @@ public class ReadStringXmlController {
                 if (empFlag) {
                     returnCode.setText("105");
                     message.setText("必填请求参数有空值!");
-                    System.out.println("必填请求参数有空值!");
-                    System.out.println("必填请求参数有空值:" + retDoc.asXML());
+                    logger.info("必填请求参数有空值!");
+                    logger.info("必填请求参数有空值:" + retDoc.asXML());
                     return retDoc.asXML();
                 }
                 List<CodeInfo>  CodeInfoList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(901));
@@ -440,8 +444,8 @@ public class ReadStringXmlController {
                 if(!bodyCheckInflag){
                     returnCode.setText("102");
                     message.setText("无法找到体检类型编码!");
-                    System.out.println("无法找到体检类型编码!");
-                    System.out.println("无法找到体检类型编码:" + retDoc.asXML());
+                    logger.info("无法找到体检类型编码!");
+                    logger.info("无法找到体检类型编码:" + retDoc.asXML());
                     return retDoc.asXML();
                 }
                 //sexCode性别代码表
@@ -456,8 +460,8 @@ public class ReadStringXmlController {
                 if(!sexCodeflag){
                     returnCode.setText("102");
                     message.setText("无法找到性别编码!");
-                    System.out.println("无法找到性别编码!");
-                    System.out.println("无法找到性别编码:" + retDoc.asXML());
+                    logger.info("无法找到性别编码!");
+                    logger.info("无法找到性别编码:" + retDoc.asXML());
                     return retDoc.asXML();
                 }
                 //判断接触监测的主要职业病危害因素编码hazardCode格式
@@ -475,7 +479,7 @@ public class ReadStringXmlController {
                     if(!hazardCodeInflag){
                         returnCode.setText("102");
                         message.setText("无法找到接触监测的主要职业病危害因素编码!");
-                        System.out.println("无法找到接触监测的主要职业病危害因素编码:" + retDoc.asXML());
+                        logger.info("无法找到接触监测的主要职业病危害因素编码:" + retDoc.asXML());
                         return retDoc.asXML();
                     }
                 }else{
@@ -491,7 +495,7 @@ public class ReadStringXmlController {
                     if(!(hazardCodeSize.length==hazardCodeInflagList.size())){
                         returnCode.setText("102");
                         message.setText("无法找到接触监测的主要职业病危害因素编码!");
-                        System.out.println("无法找到接触监测的主要职业病危害因素编码:" + retDoc.asXML());
+                        logger.info("无法找到接触监测的主要职业病危害因素编码:" + retDoc.asXML());
                         return retDoc.asXML();
                     }
                 }
@@ -510,7 +514,7 @@ public class ReadStringXmlController {
                     if(!ECGCodeInflag){
                         returnCode.setText("102");
                         message.setText("无法找到心电图编码!");
-                        System.out.println("无法找到心电图编码:" + retDoc.asXML());
+                        logger.info("无法找到心电图编码:" + retDoc.asXML());
                         return retDoc.asXML();
                     }
                 }else{
@@ -526,7 +530,7 @@ public class ReadStringXmlController {
                     if(!(ECGCodeSize.length==ECGCodeInflagList.size())){
                         returnCode.setText("102");
                         message.setText("无法找到心电图编码!");
-                        System.out.println("无法找到心电图编码:" + retDoc.asXML());
+                        logger.info("无法找到心电图编码:" + retDoc.asXML());
                         return retDoc.asXML();
                     }
                 }
@@ -537,7 +541,7 @@ public class ReadStringXmlController {
                     //判断数组的长度等于ECGCodeInflagList的长度时所有值都在表里面
                     ArrayList<Integer> CHESTCodeInflagList = new ArrayList<Integer>();
                     boolean   CHESTCodeInflag = false;
-                    System.out.println("CHESTCodeResult:" + CHESTCodeResult);
+                    logger.info("CHESTCodeResult:" + CHESTCodeResult);
                     if(CHESTCodeResult.indexOf(",")==-1){
                         for(CodeInfo codeInfo : CHESTCodeList){
                             if(CHESTCodeResult.equals(codeInfo.getCode())){
@@ -548,7 +552,7 @@ public class ReadStringXmlController {
                         if(!CHESTCodeInflag){
                             returnCode.setText("102");
                             message.setText("无法找到胸片编码!");
-                            System.out.println("无法找到胸片编码:" + retDoc.asXML());
+                            logger.info("无法找到胸片编码:" + retDoc.asXML());
                             return retDoc.asXML();
                         }
                     }else{
@@ -564,7 +568,7 @@ public class ReadStringXmlController {
                         if(!(CHESTCodeSize.length==CHESTCodeInflagList.size())){
                             returnCode.setText("102");
                             message.setText("无法找到胸片编码!");
-                            System.out.println("无法找到胸片编码:" + retDoc.asXML());
+                            logger.info("无法找到胸片编码:" + retDoc.asXML());
                             return retDoc.asXML();
                         }
                     }
@@ -582,48 +586,52 @@ public class ReadStringXmlController {
                 if(!conclusionsCodeflag){
                     returnCode.setText("102");
                     message.setText("无法找到体检结论编码!");
-                    System.out.println("无法找到体检结论编码!");
-                    System.out.println("无法找到体检结论编码:" + retDoc.asXML());
+                    logger.info("无法找到体检结论编码!");
+                    logger.info("无法找到体检结论编码:" + retDoc.asXML());
                     return retDoc.asXML();
                 }
 
                 orgCodeResult = recordEless.elementTextTrim("orgCode");
                 employerNameResult = recordEless.elementTextTrim("employerName");
                 //用人单位code和名称至少一项必填
-                System.out.println("orgCodeResult + employerNameResult！:" + orgCodeResult+"+" + employerNameResult);
+                logger.info("orgCodeResult + employerNameResult！:" + orgCodeResult+"+" + employerNameResult);
                 boolean employeeFlag = checkEmpStringIsNull(orgCodeResult,employerNameResult);
                 if(employeeFlag){
                     returnCode.setText("105");
                     message.setText("用人单位编码与用人单位名称至少有一个不为空!");
-                    System.out.println("用人单位编码与用人单位名称至少有一个不为空！:" + retDoc.asXML());
+                    logger.info("用人单位编码与用人单位名称至少有一个不为空！:" + retDoc.asXML());
                     return retDoc.asXML();
                 }
+                /*
                 if(StringUtils.isEmpty(orgCodeResult)){
                     //如果orgCode为空则查询employerName，否则查询orgCode
                     List<ZybYrdw> zybYrdwList = zybYrdwServiceImpl.selectByEmployerName(employerNameResult);
                     if(null==zybYrdwList || zybYrdwList.size()==0){
                         returnCode.setText("105");
                         message.setText("用人单位数据不存在!");
-                        System.out.println("用人单位数据不存在!");
-                        System.out.println("用人单位数据不存在！:" + retDoc.asXML());
+                        logger.info("用人单位数据不存在!");
+                        logger.info("用人单位数据不存在！:" + retDoc.asXML());
                         return retDoc.asXML();
                     }
                 }else{
-                    System.out.println("组织code:" + orgCodeResult);
+                    logger.info("组织code:" + orgCodeResult);
                     ZybYrdw zybYrdw = zybYrdwServiceImpl.selectByPrimaryKey(orgCodeResult);
                     if(null==zybYrdw){
                         returnCode.setText("105");
                         message.setText("用人单位数据不存在!");
-                        System.out.println("用人单位数据不存在!");
-                        System.out.println("用人单位数据不存在！:" + retDoc.asXML());
+                        logger.info("用人单位数据不存在!");
+                        logger.info("用人单位数据不存在！:" + retDoc.asXML());
                         return retDoc.asXML();
                     }
                 }
+                */
                 //id 为唯一标识codeResult+hosIdResult
                 zybGak.setId(codeResult+hosIdResult);
                 zybGak.setCode(codeResult);
                 zybGak.setHosId(hosIdResult);
                 zybGak.setBirthday(sdf.parse(birthdayResult));
+                zybGak.setOrgCode(orgCodeResult);
+                zybGak.setEmployerName(employerNameResult);
                 zybGak.setName(nameResult);
                 zybGak.setIdcard(idcardResult);
                 zybGak.setBodyCheckType(Short.parseShort(bodyCheckTypeResult));
@@ -778,12 +786,12 @@ public class ReadStringXmlController {
                 monitorOrgName = employingUnit.elementTextTrim("monitorOrgName");
                 remarks = employingUnit.elementTextTrim("remarks");
                 boolean empFlag = checkStringIsNull( employerCode,employerNameEN, areaStandard, areaAddress, economicCode, industryCateCode, enterpriseCode, postAddress, zipCode, contactPerson, contactPhone);
-                System.out.println("必填请求参数有空值:" + empFlag);
+                logger.info("必填请求参数有空值:" + empFlag);
                 if (empFlag) {
                     returnCode.setText("105");
                     message.setText("必填请求参数有空值!");
-                    System.out.println("必填请求参数有空值!");
-                    System.out.println("必填请求参数有空值:" + retDoc.asXML());
+                    logger.info("必填请求参数有空值!");
+                    logger.info("必填请求参数有空值:" + retDoc.asXML());
                     return retDoc.asXML();
                 }
                //economicCode经济类型编码
@@ -798,8 +806,8 @@ public class ReadStringXmlController {
                if(!economicCodeflag){
                    returnCode.setText("102");
                    message.setText("无法找到经济类型编码!");
-                   System.out.println("无法找到经济类型编码!");
-                   System.out.println("无法找到经济类型编码:" + retDoc.asXML());
+                   logger.info("无法找到经济类型编码!");
+                   logger.info("无法找到经济类型编码:" + retDoc.asXML());
                    return retDoc.asXML();
                }
                //enterpriseCode企业规模编码
@@ -814,8 +822,8 @@ public class ReadStringXmlController {
                if(!enterpriseCodeflag){
                    returnCode.setText("102");
                    message.setText("无法找到企业规模编码!");
-                   System.out.println("无法找到企业规模编码!");
-                   System.out.println("无法找到企业规模编码:" + retDoc.asXML());
+                   logger.info("无法找到企业规模编码!");
+                   logger.info("无法找到企业规模编码:" + retDoc.asXML());
                    return retDoc.asXML();
                }
                 zybYrdw.setEmployerCode(employerCode);
@@ -843,14 +851,14 @@ public class ReadStringXmlController {
                String dateString = formatter.format(currentTime);
                Date currentDate = formatter.parse(dateString);
                zybYrdw.setLogsj(currentDate);
-                System.out.println("系统时间"+dateString);
+                logger.info("系统时间"+dateString);
                 ZybYrdw zybYrdwBykey = zybYrdwServiceImpl.selectByPrimaryKey(employerCode);
 
                 if(zybYrdwBykey!=null){
-                    System.out.println("跟新用人单位数据");
+                    logger.info("跟新用人单位数据");
                     zybYrdwServiceImpl.updateByPrimaryKey(zybYrdw);
                 }else{
-                    System.out.println("插入用人单位数据");
+                    logger.info("插入用人单位数据");
                     zybYrdwServiceImpl.insert(zybYrdw);
                 }
             }
@@ -858,7 +866,7 @@ public class ReadStringXmlController {
             //格式校验 先不做校验
             /*boolean formatFlag = isDateFormate(emtList, dataInfo);
             if (!formatFlag) {
-                System.out.println("数据格式或code不唯一有误:" + retDoc.asXML());
+                logger.info("数据格式或code不唯一有误:" + retDoc.asXML());
                 return retDoc.asXML();
             }*/
 
@@ -866,12 +874,12 @@ public class ReadStringXmlController {
         } catch (Exception e) {
             returnCode.setText("103");
             message.setText("xml数据解析失败!");
-            System.out.println("xml数据解析失败:" + retDoc.asXML());
+            logger.info("xml数据解析失败:" + retDoc.asXML());
             return retDoc.asXML();
         }
         returnCode.setText("0");
         message.setText("成功!");
-        System.out.println("成功:" + retDoc.asXML());
+        logger.info("成功:" + retDoc.asXML());
         return retDoc.asXML();
     }
 
@@ -916,8 +924,8 @@ public class ReadStringXmlController {
             HashMap<String,String> hashMap = new HashMap<String,String>();
             hashMap.put("code",reportCard.getCode());
             hashMap.put("hosId",reportCard.getHosId());
-            System.out.println("code:" +reportCard.getCode());
-            System.out.println("hosId:" +reportCard.getHosId());
+            logger.info("code:" +reportCard.getCode());
+            logger.info("hosId:" +reportCard.getHosId());
             boolean isOnlyDataFlag = isOnlyData(hashMap);
             if(!isOnlyDataFlag){
                 Element errorData = errorReportCards.addElement("errorData");
