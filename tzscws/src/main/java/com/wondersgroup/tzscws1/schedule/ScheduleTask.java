@@ -146,8 +146,8 @@ public class ScheduleTask {
                 bodyStr.append("<reportCard>")
                         .append("<code>").append(CommonUtils.getString(gak.getCode())).append("</code><hosId>")
                         .append(CommonUtils.getString(gak.getHosId())).append("</hosId><name>")
-                        .append(CommonUtils.getString(gak.getName())).append("</name><idcard>")
-                        .append(CommonUtils.getString(gak.getIdcard())).append("</idcard><bodyCheckType>")
+                        .append(CommonUtils.getString(gak.getName())).append("</name><idCard>")
+                        .append(CommonUtils.getString(gak.getIdcard())).append("</idCard><bodyCheckType>")
                         .append(CommonUtils.getString(gak.getBodyCheckType())).append("</bodyCheckType><sexCode>")
                         .append(CommonUtils.getString(gak.getSexCode())).append("</sexCode><birthday>")
                         .append(CommonUtils.getString(CommonUtils.formatDate(gak.getBirthday(), "yyyy-MM-dd"))).append("</birthday><hazardCode>")
@@ -373,6 +373,9 @@ public class ScheduleTask {
                 map.put("message", messageEl.getStringValue());
             }
 
+            if (!"-1".equals(returnCodeEl.getStringValue())) {  // 只有returnCode为-1时需要解析errorDatas
+                return map;
+            }
             // 解析errorDatas中的节点
             Element errorDatasEl = rootElt.element("errorDatas");
             if (errorDatasEl == null) {
