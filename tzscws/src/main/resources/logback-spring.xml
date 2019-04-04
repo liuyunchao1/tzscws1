@@ -3,10 +3,10 @@
 
     <springProperty scope="context" name="logName" source="spring.application.name" defaultValue="tzscws"/>
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/logs/${logName}.log</file>
+        <file>/logs/tzscws/${logName}.log</file>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>/logs/${logName}-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <fileNamePattern>/logs/tzscws/${logName}-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
             <maxFileSize>30MB</maxFileSize>
             <maxHistory>7</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
@@ -31,7 +31,7 @@
         </filter>
     </appender>
 
-    <springProfile name="dev,test">
+    <springProfile name="dev,test,local">
         <root level="DEBUG">
             <appender-ref ref="FILE"/>
             <appender-ref ref="STDOUT"/>

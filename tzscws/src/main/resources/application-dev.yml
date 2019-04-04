@@ -1,3 +1,4 @@
+# 长沙
 server:
   port: 8080
 
@@ -20,4 +21,4 @@ logging:
       example:
           mapper : debug
 
-callProvincialPlatformTime: 3600000
+callProvincialPlatformTime: 10000
