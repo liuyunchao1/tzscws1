@@ -10,17 +10,17 @@
     <id column="EMPLOYER_CODE" jdbcType="VARCHAR" property="employerCode" />
     <result column="EMPLOYER_NAME" jdbcType="VARCHAR" property="employerName" />
     <result column="EMPLOYER_DESC" jdbcType="VARCHAR" property="employerDesc" />
-    <result column="AREA_STANDARD" jdbcType="DECIMAL" property="areaStandard" />
+    <result column="AREA_STANDARD" jdbcType="VARCHAR" property="areaStandard" />
     <result column="AREA_ADDRESS" jdbcType="VARCHAR" property="areaAddress" />
     <result column="ECONOMIC_CODE" jdbcType="VARCHAR" property="economicCode" />
-    <result column="INDUSTRY_CATE_CODE" jdbcType="DECIMAL" property="industryCateCode" />
-    <result column="ENTERPRISE_CODE" jdbcType="DECIMAL" property="enterpriseCode" />
-    <result column="SECOND_EMPLOYER_CODE" jdbcType="DECIMAL" property="secondEmployerCode" />
+    <result column="INDUSTRY_CATE_CODE" jdbcType="VARCHAR" property="industryCateCode" />
+    <result column="ENTERPRISE_CODE" jdbcType="VARCHAR" property="enterpriseCode" />
+    <result column="SECOND_EMPLOYER_CODE" jdbcType="VARCHAR" property="secondEmployerCode" />
     <result column="SECOND_EMPLOYER_NAME" jdbcType="VARCHAR" property="secondEmployerName" />
     <result column="POST_ADDRESS" jdbcType="VARCHAR" property="postAddress" />
-    <result column="ZIP_CODE" jdbcType="DECIMAL" property="zipCode" />
+    <result column="ZIP_CODE" jdbcType="VARCHAR" property="zipCode" />
     <result column="CONTACT_PERSON" jdbcType="VARCHAR" property="contactPerson" />
-    <result column="CONTACT_PHONE" jdbcType="DECIMAL" property="contactPhone" />
+    <result column="CONTACT_PHONE" jdbcType="VARCHAR" property="contactPhone" />
     <result column="MONITOR_ORG_CODE" jdbcType="VARCHAR" property="monitorOrgCode" />
     <result column="MONITOR_ORG_NAME" jdbcType="VARCHAR" property="monitorOrgName" />
     <result column="REMARKS" jdbcType="VARCHAR" property="remarks" />
@@ -71,10 +71,10 @@
       SBYY, SBSJ, LOGSJ
       )
     values (#{creditCode,jdbcType=VARCHAR},#{employerCode,jdbcType=VARCHAR}, #{employerName,jdbcType=VARCHAR}, #{employerDesc,jdbcType=VARCHAR},
-      #{areaStandard,jdbcType=DECIMAL}, #{areaAddress,jdbcType=VARCHAR}, #{economicCode,jdbcType=VARCHAR}, 
-      #{industryCateCode,jdbcType=DECIMAL}, #{enterpriseCode,jdbcType=DECIMAL}, #{secondEmployerCode,jdbcType=DECIMAL}, 
-      #{secondEmployerName,jdbcType=VARCHAR}, #{postAddress,jdbcType=VARCHAR}, #{zipCode,jdbcType=DECIMAL}, 
-      #{contactPerson,jdbcType=VARCHAR}, #{contactPhone,jdbcType=DECIMAL}, #{monitorOrgCode,jdbcType=VARCHAR}, 
+      #{areaStandard,jdbcType=VARCHAR}, #{areaAddress,jdbcType=VARCHAR}, #{economicCode,jdbcType=VARCHAR},
+      #{industryCateCode,jdbcType=VARCHAR}, #{enterpriseCode,jdbcType=VARCHAR}, #{secondEmployerCode,jdbcType=VARCHAR},
+      #{secondEmployerName,jdbcType=VARCHAR}, #{postAddress,jdbcType=VARCHAR}, #{zipCode,jdbcType=VARCHAR},
+      #{contactPerson,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{monitorOrgCode,jdbcType=VARCHAR},
       #{monitorOrgName,jdbcType=VARCHAR}, #{remarks,jdbcType=VARCHAR}, #{sbbz,jdbcType=VARCHAR}, 
       #{sbyy,jdbcType=VARCHAR}, #{sbsj,jdbcType=TIMESTAMP}, #{logsj,jdbcType=TIMESTAMP}
       )
@@ -164,7 +164,7 @@
         #{employerDesc,jdbcType=VARCHAR},
       </if>
       <if test="areaStandard != null">
-        #{areaStandard,jdbcType=DECIMAL},
+        #{areaStandard,jdbcType=VARCHAR},
       </if>
       <if test="areaAddress != null">
         #{areaAddress,jdbcType=VARCHAR},
@@ -173,13 +173,13 @@
         #{economicCode,jdbcType=VARCHAR},
       </if>
       <if test="industryCateCode != null">
-        #{industryCateCode,jdbcType=DECIMAL},
+        #{industryCateCode,jdbcType=VARCHAR},
       </if>
       <if test="enterpriseCode != null">
-        #{enterpriseCode,jdbcType=DECIMAL},
+        #{enterpriseCode,jdbcType=VARCHAR},
       </if>
       <if test="secondEmployerCode != null">
-        #{secondEmployerCode,jdbcType=DECIMAL},
+        #{secondEmployerCode,jdbcType=VARCHAR},
       </if>
       <if test="secondEmployerName != null">
         #{secondEmployerName,jdbcType=VARCHAR},
@@ -188,13 +188,13 @@
         #{postAddress,jdbcType=VARCHAR},
       </if>
       <if test="zipCode != null">
-        #{zipCode,jdbcType=DECIMAL},
+        #{zipCode,jdbcType=VARCHAR},
       </if>
       <if test="contactPerson != null">
         #{contactPerson,jdbcType=VARCHAR},
       </if>
       <if test="contactPhone != null">
-        #{contactPhone,jdbcType=DECIMAL},
+        #{contactPhone,jdbcType=VARCHAR},
       </if>
       <if test="monitorOrgCode != null">
         #{monitorOrgCode,jdbcType=VARCHAR},
@@ -236,7 +236,7 @@
         EMPLOYER_DESC = #{employerDesc,jdbcType=VARCHAR},
       </if>
       <if test="areaStandard != null">
-        AREA_STANDARD = #{areaStandard,jdbcType=DECIMAL},
+        AREA_STANDARD = #{areaStandard,jdbcType=VARCHAR},
       </if>
       <if test="areaAddress != null">
         AREA_ADDRESS = #{areaAddress,jdbcType=VARCHAR},
@@ -245,13 +245,13 @@
         ECONOMIC_CODE = #{economicCode,jdbcType=VARCHAR},
       </if>
       <if test="industryCateCode != null">
-        INDUSTRY_CATE_CODE = #{industryCateCode,jdbcType=DECIMAL},
+        INDUSTRY_CATE_CODE = #{industryCateCode,jdbcType=VARCHAR},
       </if>
       <if test="enterpriseCode != null">
-        ENTERPRISE_CODE = #{enterpriseCode,jdbcType=DECIMAL},
+        ENTERPRISE_CODE = #{enterpriseCode,jdbcType=VARCHAR},
       </if>
       <if test="secondEmployerCode != null">
-        SECOND_EMPLOYER_CODE = #{secondEmployerCode,jdbcType=DECIMAL},
+        SECOND_EMPLOYER_CODE = #{secondEmployerCode,jdbcType=VARCHAR},
       </if>
       <if test="secondEmployerName != null">
         SECOND_EMPLOYER_NAME = #{secondEmployerName,jdbcType=VARCHAR},
@@ -260,13 +260,13 @@
         POST_ADDRESS = #{postAddress,jdbcType=VARCHAR},
       </if>
       <if test="zipCode != null">
-        ZIP_CODE = #{zipCode,jdbcType=DECIMAL},
+        ZIP_CODE = #{zipCode,jdbcType=VARCHAR},
       </if>
       <if test="contactPerson != null">
         CONTACT_PERSON = #{contactPerson,jdbcType=VARCHAR},
       </if>
       <if test="contactPhone != null">
-        CONTACT_PHONE = #{contactPhone,jdbcType=DECIMAL},
+        CONTACT_PHONE = #{contactPhone,jdbcType=VARCHAR},
       </if>
       <if test="monitorOrgCode != null">
         MONITOR_ORG_CODE = #{monitorOrgCode,jdbcType=VARCHAR},
@@ -301,17 +301,17 @@
     set CREDIT_CODE = #{creditCode,jdbcType=VARCHAR},
       EMPLOYER_NAME = #{employerName,jdbcType=VARCHAR},
       EMPLOYER_DESC = #{employerDesc,jdbcType=VARCHAR},
-      AREA_STANDARD = #{areaStandard,jdbcType=DECIMAL},
+      AREA_STANDARD = #{areaStandard,jdbcType=VARCHAR},
       AREA_ADDRESS = #{areaAddress,jdbcType=VARCHAR},
       ECONOMIC_CODE = #{economicCode,jdbcType=VARCHAR},
-      INDUSTRY_CATE_CODE = #{industryCateCode,jdbcType=DECIMAL},
-      ENTERPRISE_CODE = #{enterpriseCode,jdbcType=DECIMAL},
-      SECOND_EMPLOYER_CODE = #{secondEmployerCode,jdbcType=DECIMAL},
+      INDUSTRY_CATE_CODE = #{industryCateCode,jdbcType=VARCHAR},
+      ENTERPRISE_CODE = #{enterpriseCode,jdbcType=VARCHAR},
+      SECOND_EMPLOYER_CODE = #{secondEmployerCode,jdbcType=VARCHAR},
       SECOND_EMPLOYER_NAME = #{secondEmployerName,jdbcType=VARCHAR},
       POST_ADDRESS = #{postAddress,jdbcType=VARCHAR},
-      ZIP_CODE = #{zipCode,jdbcType=DECIMAL},
+      ZIP_CODE = #{zipCode,jdbcType=VARCHAR},
       CONTACT_PERSON = #{contactPerson,jdbcType=VARCHAR},
-      CONTACT_PHONE = #{contactPhone,jdbcType=DECIMAL},
+      CONTACT_PHONE = #{contactPhone,jdbcType=VARCHAR},
       MONITOR_ORG_CODE = #{monitorOrgCode,jdbcType=VARCHAR},
       MONITOR_ORG_NAME = #{monitorOrgName,jdbcType=VARCHAR},
       REMARKS = #{remarks,jdbcType=VARCHAR},
