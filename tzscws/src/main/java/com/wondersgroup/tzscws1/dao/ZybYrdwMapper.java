@@ -65,4 +65,11 @@ public interface ZybYrdwMapper {
      * @return
      */
     List<ZybYrdw> selectByIdList(@Param("idList") List<String> idList);
+
+    /**
+     * 根据name批量查找
+     * @param nameList name列表
+     * @return
+     */
+    List<ZybYrdw> selectByNameList(@Param("nameList") List<String> nameList);
 }

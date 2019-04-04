@@ -21,4 +21,11 @@ public interface ZybYrdwService {
      */
     List<ZybYrdw> selectByIdList(List<String> idList);
 
+    /**
+     * 根据name批量查找
+     * @param nameList name列表
+     * @return
+     */
+    List<ZybYrdw> selectByNameList(List<String> nameList);
+
 }

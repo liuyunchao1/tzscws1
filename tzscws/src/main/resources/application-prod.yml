@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    username: jbyfkzuser
+    password: jbyfkzuser
+    url: jdbc:oracle:thin:@10.1.94.84:1521/jbyfkzdb
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+
+mybatis:
+  mapper-locations: classpath:mapping/*Mapper.xml
+  type-aliases-package: com.wondersgroup.tzscws1.model
+
+
+#showSql
+logging:
+  level:
+    com:
+      example:
+          mapper : debug
+
+callProvincialPlatformTime: 3600000

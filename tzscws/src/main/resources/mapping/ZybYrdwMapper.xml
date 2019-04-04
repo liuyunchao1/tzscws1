@@ -333,4 +333,16 @@
       #{item}
     </foreach>
   </select>
+
+  <!-- 根据name批量查找 -->
+  <select id="selectByNameList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from ZYB_YRDW
+    where EMPLOYER_NAME in
+    <foreach collection="nameList" item="item" index="index" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </select>
+
 </mapper>
