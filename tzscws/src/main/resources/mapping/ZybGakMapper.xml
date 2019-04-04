@@ -1196,7 +1196,7 @@
     IDCARD = #{idcard,jdbcType=VARCHAR},
     TEL_PHONE = #{telPhone,jdbcType=VARCHAR},
     BODY_CHECK_TYPE = #{bodyCheckType,jdbcType=DECIMAL},
-    BODY_CHECK_TYPE = #{bodyCheckTime,jdbcType=TIMESTAMP},
+    BODY_CHECK_TIME = #{bodyCheckTime,jdbcType=TIMESTAMP},
     SEX_CODE = #{sexCode,jdbcType=DECIMAL},
     BIRTHDAY = #{birthday,jdbcType=TIMESTAMP},
     SENIORITY_YEAR = #{seniorityYear,jdbcType=DECIMAL},
