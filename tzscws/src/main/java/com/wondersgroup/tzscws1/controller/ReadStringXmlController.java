@@ -836,19 +836,19 @@ public class ReadStringXmlController {
                 zybYrdw.setEmployerCode(employerCode);
                 zybYrdw.setEmployerName(employerNameEN);
                 zybYrdw.setEmployerDesc(employerDesc);
-                zybYrdw.setAreaStandard(Integer.valueOf(areaStandard));
+                zybYrdw.setAreaStandard(areaStandard);
                 zybYrdw.setAreaAddress(areaAddress);
                 zybYrdw.setEconomicCode(economicCode);
-                zybYrdw.setIndustryCateCode(Short.parseShort(industryCateCode));
-                zybYrdw.setEnterpriseCode(Short.parseShort(enterpriseCode));
+                zybYrdw.setIndustryCateCode(industryCateCode);
+                zybYrdw.setEnterpriseCode(enterpriseCode);
                 if(!StringUtils.isEmpty(secondEmployerCode)){
-                    zybYrdw.setSecondEmployerCode(Long.parseLong(secondEmployerCode));
+                    zybYrdw.setSecondEmployerCode(secondEmployerCode);
                 }
                 zybYrdw.setSecondEmployerName(secondEmployerName);
                 zybYrdw.setPostAddress(postAddress);
-                zybYrdw.setZipCode(Integer.valueOf(zipCode));
+                zybYrdw.setZipCode(zipCode);
                 zybYrdw.setContactPerson(contactPerson);
-                zybYrdw.setContactPhone(Long.parseLong(contactPhone));
+                zybYrdw.setContactPhone(contactPhone);
                 zybYrdw.setMonitorOrgCode(monitorOrgCode);
                 zybYrdw.setMonitorOrgName(monitorOrgName);
                 zybYrdw.setRemarks(remarks);
