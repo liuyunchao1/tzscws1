@@ -234,6 +234,7 @@ public class ReadStringXmlController {
              String nameResult= "";
              String idcardResult= "";
              String bodyCheckTypeResult= "";
+             String bodyCheckTimeResult="";
              String sexCodeResult= "";
              String birthdayResult= "";
              String hazardCodeResult= "";//多种结果之间使用英文逗号（,）分隔
@@ -325,7 +326,7 @@ public class ReadStringXmlController {
              String hearingMaxRangeResult= "";
              String RPBTCodeResult= "";
              String wrightCodeResult= "";
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMDD");
             while (iterss.hasNext()) {
                 Element recordEless = (Element) iterss.next();
                 //字段空值校验
@@ -335,6 +336,7 @@ public class ReadStringXmlController {
                 nameResult = recordEless.elementTextTrim("name");
                 idcardResult = recordEless.elementTextTrim("idcard");
                 bodyCheckTypeResult = recordEless.elementTextTrim("bodyCheckType");
+                bodyCheckTimeResult = recordEless.elementTextTrim("bodyCheckTime");
                 sexCodeResult = recordEless.elementTextTrim("sexCode");
                 birthdayResult = recordEless.elementTextTrim("birthday");
                 hazardCodeResult = recordEless.elementTextTrim("hazardCode");//多种结果之间使用英文逗号（,）分隔
@@ -424,7 +426,7 @@ public class ReadStringXmlController {
                 hearingMaxRangeResult = recordEless.elementTextTrim("hearingMaxRange");
                 RPBTCodeResult = recordEless.elementTextTrim("RPBTCode");
                 wrightCodeResult = recordEless.elementTextTrim("wrightCode");
-                boolean empFlag = checkStringIsNull( codeResult,hosIdResult, nameResult, idcardResult, bodyCheckTypeResult, sexCodeResult, birthdayResult, hazardCodeResult, hazardYearResult, hazardMonthResult, sysPressResult, diasPressResult, ECGCodeResult, conclusionsCodeResult);
+                boolean empFlag = checkStringIsNull( codeResult,hosIdResult, nameResult, idcardResult, bodyCheckTypeResult, bodyCheckTimeResult, sexCodeResult, birthdayResult, hazardCodeResult, hazardYearResult, hazardMonthResult, sysPressResult, diasPressResult, ECGCodeResult, conclusionsCodeResult);
                 if (empFlag) {
                     returnCode.setText("105");
                     message.setText("必填请求参数有空值!");
@@ -635,6 +637,7 @@ public class ReadStringXmlController {
                 zybGak.setName(nameResult);
                 zybGak.setIdcard(idcardResult);
                 zybGak.setBodyCheckType(Short.parseShort(bodyCheckTypeResult));
+                zybGak.setBodyCheckTime(sdf.parse(bodyCheckTimeResult));
                 zybGak.setSexCode(Short.parseShort(sexCodeResult));
                 zybGak.setHazardCode(hazardCodeResult);
                 zybGak.setHazardYear(Short.parseShort(hazardYearResult));
@@ -748,6 +751,7 @@ public class ReadStringXmlController {
                 }
             }
             ArrayList<ZybYrdw> ZybYrdwList =  new ArrayList<ZybYrdw>();
+            String creditCode = "";
             String employerCode = "";
             String employerNameEN = "";
             String employerDesc = "";
@@ -768,6 +772,7 @@ public class ReadStringXmlController {
            while(employingUnitIte.hasNext()){
                 ZybYrdw zybYrdw = new ZybYrdw();
                 Element employingUnit = (Element) employingUnitIte.next();
+                creditCode = employingUnit.elementTextTrim("creditCode");
                 employerCode = employingUnit.elementTextTrim("employerCode");
                 employerNameEN = employingUnit.elementTextTrim("employerName");
                 employerDesc= employingUnit.elementTextTrim("employerDesc");
@@ -785,7 +790,7 @@ public class ReadStringXmlController {
                 monitorOrgCode = employingUnit.elementTextTrim("monitorOrgCode");
                 monitorOrgName = employingUnit.elementTextTrim("monitorOrgName");
                 remarks = employingUnit.elementTextTrim("remarks");
-                boolean empFlag = checkStringIsNull( employerCode,employerNameEN, areaStandard, areaAddress, economicCode, industryCateCode, enterpriseCode, postAddress, zipCode, contactPerson, contactPhone);
+                boolean empFlag = checkStringIsNull( creditCode,employerCode,employerNameEN, areaStandard, areaAddress, economicCode, industryCateCode, enterpriseCode, postAddress, zipCode, contactPerson, contactPhone);
                 logger.info("必填请求参数有空值:" + empFlag);
                 if (empFlag) {
                     returnCode.setText("105");
@@ -826,6 +831,7 @@ public class ReadStringXmlController {
                    logger.info("无法找到企业规模编码:" + retDoc.asXML());
                    return retDoc.asXML();
                }
+                zybYrdw.setCreditCode(creditCode);
                 zybYrdw.setEmployerCode(employerCode);
                 zybYrdw.setEmployerName(employerNameEN);
                 zybYrdw.setEmployerDesc(employerDesc);
