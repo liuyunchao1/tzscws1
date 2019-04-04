@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 定时任务
@@ -150,7 +149,7 @@ public class ScheduleTask {
                         .append(CommonUtils.getString(gak.getIdcard())).append("</idCard><bodyCheckType>")
                         .append(CommonUtils.getString(gak.getBodyCheckType())).append("</bodyCheckType><sexCode>")
                         .append(CommonUtils.getString(gak.getSexCode())).append("</sexCode><birthday>")
-                        .append(CommonUtils.getString(CommonUtils.formatDate(gak.getBirthday(), "yyyy-MM-dd"))).append("</birthday><hazardCode>")
+                        .append(CommonUtils.getString(CommonUtils.formatDate(gak.getBirthday(), "yyyyMMdd"))).append("</birthday><hazardCode>")
                         .append(CommonUtils.getString(gak.getHazardCode())).append("</hazardCode><hazardYear>")
                         .append(CommonUtils.getString(gak.getHazardYear())).append("</hazardYear><hazardMonth>")
                         .append(CommonUtils.getString(gak.getHazardMonth())).append("</hazardMonth><sysPressResult>")
@@ -239,7 +238,8 @@ public class ScheduleTask {
                         .append(CommonUtils.getString(gak.getHearingMaxRange())).append("</hearingMaxRange><rpbtCode>")
                         .append(CommonUtils.getString(gak.getRpbtCode())).append("</rpbtCode><wrightCode>")
                         .append(CommonUtils.getString(gak.getWrightCode())).append("</wrightCode><conclusionsCode>")
-                        .append(CommonUtils.getString(gak.getConclusionsCode())).append("</conclusionsCode>")
+                        .append(CommonUtils.getString(gak.getConclusionsCode())).append("</conclusionsCode><bodyCheckTime>")
+                        .append(CommonUtils.getString(CommonUtils.formatDate(gak.getBodyCheckTime(), "yyyyMMdd"))).append("</bodyCheckTime>")
                         .append("</reportCard>");
 
                 //查询企业信息
@@ -272,7 +272,9 @@ public class ScheduleTask {
                             .append(CommonUtils.getString(zybYrdw.getRemarks())).append("</remarks><sbbz>")
                             .append(CommonUtils.getString(zybYrdw.getSbbz())).append("</sbbz><sbyy>")
                             .append(CommonUtils.getString(zybYrdw.getSbyy())).append("</sbyy><sbsj>")
-                            .append(CommonUtils.getString(zybYrdw.getSbsj())).append("</sbsj>").append("</employingUnit>");
+                            .append(CommonUtils.getString(zybYrdw.getSbsj())).append("</sbsj><creditCode>")
+                            .append(CommonUtils.getString(zybYrdw.getCreditCode())).append("</creditCode>")
+                            .append("</employingUnit>");
                 }
             }
             bodyStr.append("</reportCards><employingUnits>").append(employingStr).append("</employingUnits></body>");

@@ -4,6 +4,10 @@ import java.util.Date;
 
 public class ZybYrdw {
     /**
+     * 社会统一信用代码 ZYB_YRDW.CREDIT_CODE
+     */
+    private String creditCode;
+    /**
      * 用人单位编码 ZYB_YRDW.EMPLOYER_CODE
      */
     private String employerCode;
@@ -610,5 +614,13 @@ public class ZybYrdw {
      */
     public void setLogsj(Date logsj) {
         this.logsj = logsj;
+    }
+
+    public String getCreditCode() {
+        return creditCode;
+    }
+
+    public void setCreditCode(String creditCode) {
+        this.creditCode = creditCode;
     }
 }
