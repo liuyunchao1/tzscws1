@@ -5,7 +5,8 @@ spring:
   datasource:
     username: tzjk_uat
     password: tzjk_uat
-    url: jdbc:oracle:thin:@20.76.200.103:1521/orcl
+    #url: jdbc:oracle:thin:@20.76.200.103:1521/orcl
+    url: jdbc:oracle:thin:@172.16.8.251:1521/orcl
     driver-class-name: oracle.jdbc.driver.OracleDriver
 
 mybatis:
