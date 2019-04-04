@@ -426,7 +426,9 @@ public class ReadStringXmlController {
                 hearingMaxRangeResult = recordEless.elementTextTrim("hearingMaxRange");
                 RPBTCodeResult = recordEless.elementTextTrim("RPBTCode");
                 wrightCodeResult = recordEless.elementTextTrim("wrightCode");
-                boolean empFlag = checkStringIsNull( codeResult,hosIdResult, nameResult, idcardResult, bodyCheckTypeResult, bodyCheckTimeResult, sexCodeResult, birthdayResult, hazardCodeResult, hazardYearResult, hazardMonthResult, sysPressResult, diasPressResult, ECGCodeResult, conclusionsCodeResult);
+                orgCodeResult = recordEless.elementTextTrim("orgCode");
+                employerNameResult = recordEless.elementTextTrim("employerName");
+                boolean empFlag = checkStringIsNull( codeResult,hosIdResult, nameResult, idcardResult, bodyCheckTypeResult, bodyCheckTimeResult, sexCodeResult, birthdayResult, hazardCodeResult, hazardYearResult, hazardMonthResult, sysPressResult, diasPressResult, ECGCodeResult, conclusionsCodeResult,orgCodeResult,employerNameResult);
                 if (empFlag) {
                     returnCode.setText("105");
                     message.setText("必填请求参数有空值!");
@@ -593,17 +595,16 @@ public class ReadStringXmlController {
                     return retDoc.asXML();
                 }
 
-                orgCodeResult = recordEless.elementTextTrim("orgCode");
-                employerNameResult = recordEless.elementTextTrim("employerName");
+
                 //用人单位code和名称至少一项必填
-                logger.info("orgCodeResult + employerNameResult！:" + orgCodeResult+"+" + employerNameResult);
+               /* logger.info("orgCodeResult + employerNameResult！:" + orgCodeResult+"+" + employerNameResult);
                 boolean employeeFlag = checkEmpStringIsNull(orgCodeResult,employerNameResult);
                 if(employeeFlag){
                     returnCode.setText("105");
                     message.setText("用人单位编码与用人单位名称至少有一个不为空!");
                     logger.info("用人单位编码与用人单位名称至少有一个不为空！:" + retDoc.asXML());
                     return retDoc.asXML();
-                }
+                }*/
                 /*
                 if(StringUtils.isEmpty(orgCodeResult)){
                     //如果orgCode为空则查询employerName，否则查询orgCode
