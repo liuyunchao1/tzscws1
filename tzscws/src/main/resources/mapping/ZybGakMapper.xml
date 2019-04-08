@@ -1308,7 +1308,7 @@
     select
     <include refid="Base_Column_List" />
     from ZYB_GAK
-    where SHBZ = 1 and (SBBZ is null or SBBZ == 0)
+    where SHBZ = 1 and (SBBZ is null or SBBZ = 0)
     order by SBBZ desc nulls last, SHSJ desc nulls last
   </select>
 
