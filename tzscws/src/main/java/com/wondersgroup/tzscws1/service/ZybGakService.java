@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public interface ZybGakService {
@@ -18,7 +19,7 @@ public interface ZybGakService {
      * 调用上传省平台接口查找数据
      * @return
      */
-    List<ZybGak> selectForCallProvincial();
+    List<ZybGak> selectForCallProvincial(Map<String, Object> params);
 
     /**
      * 更新
