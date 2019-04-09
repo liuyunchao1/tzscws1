@@ -20,8 +20,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,6 +63,7 @@ public class ProvincialPlatformServiceImpl implements ProvincialPlatformService 
     @Autowired
     private ZybYrdwMapper zybYrdwMapper;
 
+    @Transactional
     public Map<String, Integer> batchCallProvincialPlatform(List<ZybGak> list) {
         Map<String, Integer> resultNum = new HashMap<>();
         resultNum.put(Constant.SUC_NUM, 0);
