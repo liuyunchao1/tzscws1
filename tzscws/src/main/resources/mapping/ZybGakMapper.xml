@@ -1304,12 +1304,18 @@
   </select>
 
   <!-- 调用上传省平台接口查找数据 -->
-  <select id="selectForCallProvincial"  resultMap="BaseResultMap">
+  <select id="selectForCallProvincial" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from ZYB_GAK
     where SHBZ = 1 and (SBBZ is null or SBBZ = 0)
-    order by SBBZ desc nulls last, SHSJ desc nulls last
+    <if test="params != null and params.idList != null">
+      and ID in
+      <foreach collection="params.idList" item="item" index="index" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
+    </if>
+    order by SHSJ desc nulls last
   </select>
 
 </mapper>
