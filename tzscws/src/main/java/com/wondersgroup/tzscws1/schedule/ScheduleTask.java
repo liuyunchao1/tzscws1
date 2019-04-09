@@ -18,6 +18,7 @@ import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -37,6 +38,12 @@ public class ScheduleTask {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    /**
+     * 请求参数头中的hosid
+     */
+    @Value("${headerHosId}")
+    private String headerHosId;
+
     @Autowired
     private ZybGakService zybGakService;
 
@@ -55,6 +62,22 @@ public class ScheduleTask {
             logger.info("==========没有数据要上传============");
             return;
         }
+
+        // 分批次调用上传省平台接口
+        int dealNum = 50;   // 单次发送的数据量
+        int insertLength = list.size();
+        int i = 0;
+        while (insertLength > dealNum) {
+            callProvincialPlatform(list.subList(i, i + dealNum));
+            i = i + dealNum;
+            insertLength = insertLength - dealNum;
+        }
+        if (insertLength > 0) {
+            callProvincialPlatform(list.subList(i, i + insertLength));
+        }
+
+
+        /* 不用按hosid分组了，头信息里存固定的hosid，子列表中每一项的hosid可以不同
         for (ZybGak p : list) {
             if (StringUtils.isEmpty(p.getHosId())) {
                 p.setHosId("");
@@ -62,7 +85,8 @@ public class ScheduleTask {
         }
 
         // 按医院编号分组，一次只发送同一个医院的
-//        Map<String, List<ZybGak>> listMap = list.stream().collect(Collectors.groupingBy(ZybGak::getHosId));
+        //  Map<String, List<ZybGak>> listMap = list.stream().collect(Collectors.groupingBy(ZybGak::getHosId));
+        //  listMap.forEach((k, v) -> callProvincialPlatformHos(v));
         Map<String, List<ZybGak>> listMap = new HashMap<>();
         String hosid;
         for (ZybGak p : list) {
@@ -79,29 +103,7 @@ public class ScheduleTask {
         for (Map.Entry<String, List<ZybGak>> en : listMap.entrySet()) {
             callProvincialPlatformHos(en.getValue());
         }
-//        listMap.forEach((k, v) -> callProvincialPlatformHos(v));
-    }
-
-    /**
-     * 调用上传省平台接口-单个医院
-     */
-    private void callProvincialPlatformHos(List<ZybGak> list) {
-        if (CollectionUtils.isEmpty(list)) {
-            return;
-        }
-
-        // 分批次调用上传省平台接口
-        int dealNum = 50;   // 单次发送的数据量
-        int insertLength = list.size();
-        int i = 0;
-        while (insertLength > dealNum) {
-            callProvincialPlatform(list.subList(i, i + dealNum));
-            i = i + dealNum;
-            insertLength = insertLength - dealNum;
-        }
-        if (insertLength > 0) {
-            callProvincialPlatform(list.subList(i, i + insertLength));
-        }
+        */
     }
 
     /**
@@ -122,15 +124,15 @@ public class ScheduleTask {
             StringBuilder bodyStr = new StringBuilder();    //body标签另外做一个字符串用于加签
             StringBuilder employingStr = new StringBuilder();  //企业基本信息
             String eventId = "test";//业务请求类型编码  test免验证用于测试
-            String hosId = list.get(0).getHosId();//医院编码
+//            String hosId = list.get(0).getHosId();//医院编码
             String dateStr = CommonUtils.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss");
             Verification verification = new Verification();
-            String headSign = verification.MD5(eventId + dateStr + hosId + Constant.PASSORD);//用户秘钥
+            String headSign = verification.MD5(eventId + dateStr + headerHosId + Constant.PASSORD);//用户秘钥
             String bodySign = "";//数据签名
             strXml.append("<data><header><eventId>");
             strXml.append(eventId);
             strXml.append("</eventId><hosId>");
-            strXml.append(hosId);
+            strXml.append(headerHosId);
             strXml.append("</hosId><requestTime>");
             strXml.append(dateStr);
             strXml.append("</requestTime><headSign>");
