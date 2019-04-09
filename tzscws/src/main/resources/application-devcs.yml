@@ -1,11 +1,12 @@
+# 长沙开发数据库
 server:
   port: 8080
 
 spring:
   datasource:
-    username: tzmb
-    password: tzmb
-    url: jdbc:oracle:thin:@172.16.110.41:1521/wdphis
+    username: jbyfkzuser
+    password: jbyfkzuser
+    url: jdbc:oracle:thin:@10.1.94.84:1521/jbyfkzdb
     driver-class-name: oracle.jdbc.driver.OracleDriver
 
 mybatis:

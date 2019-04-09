@@ -31,7 +31,7 @@
         </filter>
     </appender>
 
-    <springProfile name="dev,test,local">
+    <springProfile name="devcs,dev,test">
         <root level="DEBUG">
             <appender-ref ref="FILE"/>
             <appender-ref ref="STDOUT"/>
