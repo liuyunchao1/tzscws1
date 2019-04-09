@@ -22,5 +22,9 @@ logging:
 
 callProvincialPlatformTime: 10000
 
-# 调用省平台上传接口时，请求参数头中的hosid
-headerHosId: 33100000
+# 调用省平台上传接口需要的参数
+provincialPlatform:
+  url: https://www.xiaoyisheng.net.cn/ws_data/ws/TJ?wsdl
+  method: transport
+  # 请求参数头中的hosid
+  headerHosId: 33100000

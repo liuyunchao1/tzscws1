@@ -38,9 +38,21 @@ public class ProvincialPlatformServiceImpl implements ProvincialPlatformService 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
+     * webservice url
+     */
+    @Value("${provincialPlatform.url}")
+    private String webserviceUrl;
+
+    /**
+     * webservice method
+     */
+    @Value("${provincialPlatform.method}")
+    private String webserviceMethod;
+
+    /**
      * 请求参数头中的hosid
      */
-    @Value("${headerHosId}")
+    @Value("${provincialPlatform.headerHosId}")
     private String headerHosId;
 
     @Autowired
@@ -272,8 +284,7 @@ public class ProvincialPlatformServiceImpl implements ProvincialPlatformService 
             strXml.append(bodyStr).append("</data>");
             //调用省平台的接口
             SoapWebServiceClient soap = new SoapWebServiceClient();
-            Object resultJson = soap.callWebService("https://www.xiaoyisheng.net.cn/ws_data/ws/TJ?wsdl", "transport",
-                    strXml.toString());
+            Object resultJson = soap.callWebService(webserviceUrl, webserviceMethod, strXml.toString());
 
             JsonConfig jsonConfig = new JsonConfig();
             jsonConfig.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);
