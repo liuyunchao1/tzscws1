@@ -22,3 +22,6 @@ logging:
           mapper : debug
 
 callProvincialPlatformTime: 3600000
+
+# 调用省平台上传接口时，请求参数头中的hosid
+headerHosId: 33100000
