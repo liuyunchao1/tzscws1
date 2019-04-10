@@ -49,7 +49,9 @@ public class ProvincialPlatformController {
 
             Map<String, Object> params = new HashMap<>();
             params.put("idList", idList);
-            List<ZybGak> list = zybGakService.selectForCallProvincial(params);    // 已审核，但未发送的数据
+            params.put("shbz", "1");
+            params.put("sbbzNot", "1");
+            List<ZybGak> list = zybGakService.selectByParams(params);    // 已审核，但未发送的数据
             if (CollectionUtils.isEmpty(list)) {
                 return "没有需要发送的数据";
             }
@@ -57,6 +59,7 @@ public class ProvincialPlatformController {
             Map<String, Integer> result = provincialPlatformService.batchCallProvincialPlatform(list);
             String str = "成功数量: " + ((result != null && result.get(Constant.SUC_NUM) != null) ? result.get(Constant.SUC_NUM) : 0)
                     + " ; " + "失败数量: " + ((result != null && result.get(Constant.FAI_NUM) != null) ? result.get(Constant.FAI_NUM) : 0);
+            logger.info(str);
             return str;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

@@ -1303,7 +1303,7 @@
       and HOS_ID=#{hosId,jdbcType=VARCHAR}
   </select>
 
-  <!-- 调用上传省平台接口查找数据 -->
+  <!-- 定时调用上传省平台接口查找数据 -->
   <select id="selectForCallProvincial" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
@@ -1315,7 +1315,28 @@
         #{item}
       </foreach>
     </if>
+    AND ROWNUM &lt;= 1000
     order by SHSJ desc nulls last
+  </select>
+
+  <!-- 根据参数查找数据 -->
+  <select id="selectByParams" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from ZYB_GAK
+    where 1=1
+    <if test='params != null and params.shbz != null and params.shbz != ""'>
+      and SHBZ = #{params.shbz}
+    </if>
+    <if test='params != null and params.sbbzNot != null and params.sbbzNot != ""'>
+      and (SBBZ is null or SBBZ != #{params.sbbzNot})
+    </if>
+    <if test="params != null and params.idList != null">
+      and ID in
+      <foreach collection="params.idList" item="item" index="index" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
+    </if>
   </select>
 
 </mapper>

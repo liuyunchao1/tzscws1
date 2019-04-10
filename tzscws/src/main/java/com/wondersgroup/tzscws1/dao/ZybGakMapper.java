@@ -65,4 +65,10 @@ public interface ZybGakMapper {
      * @return
      */
     List<ZybGak> selectForCallProvincial(@Param("params") Map<String, Object> params);
+
+    /**
+     * 根据参数查找数据
+     * @return
+     */
+    List<ZybGak> selectByParams(@Param("params") Map<String, Object> params);
 }

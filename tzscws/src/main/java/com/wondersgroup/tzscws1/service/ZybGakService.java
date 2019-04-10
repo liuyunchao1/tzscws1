@@ -22,6 +22,12 @@ public interface ZybGakService {
     List<ZybGak> selectForCallProvincial(Map<String, Object> params);
 
     /**
+     * 根据参数查找数据
+     * @return
+     */
+    List<ZybGak> selectByParams(Map<String, Object> params);
+
+    /**
      * 更新
      * @param record
      * @return
