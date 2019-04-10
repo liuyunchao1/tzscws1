@@ -33,6 +33,11 @@ public class ZybGakServiceImpl implements ZybGakService{
     }
 
     @Override
+    public List<ZybGak> selectByParams(Map<String, Object> params) {
+        return zybGakMapper.selectByParams(params);
+    }
+
+    @Override
     public int updateByPrimaryKeySelective(ZybGak record) {
         return zybGakMapper.updateByPrimaryKeySelective(record);
     }
