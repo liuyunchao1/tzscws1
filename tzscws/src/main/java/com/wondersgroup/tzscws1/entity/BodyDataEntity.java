@@ -7,6 +7,7 @@ public class BodyDataEntity {
     private String name;
     private String idcard ;
     private String bodyCheckType;
+    private String bodyCheckTime;
     private String sexCode;
     private String birthday;
     private String hazardCode;//多种结果之间使用英文逗号（,）分隔
@@ -98,6 +99,27 @@ public class BodyDataEntity {
     private String hearingMaxRange;
     private String RPBTCode;
     private String wrightCode;
+    private String creditCode;
+    private String employerCode;
+    private String employerNameEN;
+    private String employerDesc;
+    private String areaStandard;
+    private String areaAddress;
+    private String economicCode;
+    private String industryCateCode;
+    private String enterpriseCode;
+    private String secondEmployerCode;
+    private String secondEmployerName;
+    private String postAddress;
+    private String zipCode;
+    private String contactPerson;
+    private String contactPhone;
+    private String monitorOrgCode;
+    private String monitorOrgName;
+    private String remarks;
+
+
+
     public void setCode(String code) {
         this.code = code;
     }
@@ -864,5 +886,157 @@ public class BodyDataEntity {
 
     public void setWrightCode(String wrightCode) {
         this.wrightCode = wrightCode;
+    }
+
+    public String getBodyCheckTime() {
+        return bodyCheckTime;
+    }
+
+    public void setBodyCheckTime(String bodyCheckTime) {
+        this.bodyCheckTime = bodyCheckTime;
+    }
+
+    public String getEmployerCode() {
+        return employerCode;
+    }
+
+    public String getEmployerNameEN() {
+        return employerNameEN;
+    }
+
+    public String getEmployerDesc() {
+        return employerDesc;
+    }
+
+    public String getAreaStandard() {
+        return areaStandard;
+    }
+
+    public String getAreaAddress() {
+        return areaAddress;
+    }
+
+    public String getEconomicCode() {
+        return economicCode;
+    }
+
+    public String getIndustryCateCode() {
+        return industryCateCode;
+    }
+
+    public String getEnterpriseCode() {
+        return enterpriseCode;
+    }
+
+    public String getSecondEmployerCode() {
+        return secondEmployerCode;
+    }
+
+    public String getSecondEmployerName() {
+        return secondEmployerName;
+    }
+
+    public String getPostAddress() {
+        return postAddress;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public String getContactPerson() {
+        return contactPerson;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public String getMonitorOrgCode() {
+        return monitorOrgCode;
+    }
+
+    public String getMonitorOrgName() {
+        return monitorOrgName;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setEmployerCode(String employerCode) {
+        this.employerCode = employerCode;
+    }
+
+    public void setEmployerNameEN(String employerNameEN) {
+        this.employerNameEN = employerNameEN;
+    }
+
+    public void setEmployerDesc(String employerDesc) {
+        this.employerDesc = employerDesc;
+    }
+
+    public void setAreaStandard(String areaStandard) {
+        this.areaStandard = areaStandard;
+    }
+
+    public void setAreaAddress(String areaAddress) {
+        this.areaAddress = areaAddress;
+    }
+
+    public void setEconomicCode(String economicCode) {
+        this.economicCode = economicCode;
+    }
+
+    public void setIndustryCateCode(String industryCateCode) {
+        this.industryCateCode = industryCateCode;
+    }
+
+    public void setEnterpriseCode(String enterpriseCode) {
+        this.enterpriseCode = enterpriseCode;
+    }
+
+    public void setSecondEmployerCode(String secondEmployerCode) {
+        this.secondEmployerCode = secondEmployerCode;
+    }
+
+    public void setSecondEmployerName(String secondEmployerName) {
+        this.secondEmployerName = secondEmployerName;
+    }
+
+    public void setPostAddress(String postAddress) {
+        this.postAddress = postAddress;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public void setContactPerson(String contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
+    }
+
+    public void setMonitorOrgCode(String monitorOrgCode) {
+        this.monitorOrgCode = monitorOrgCode;
+    }
+
+    public void setMonitorOrgName(String monitorOrgName) {
+        this.monitorOrgName = monitorOrgName;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public String getCreditCode() {
+        return creditCode;
+    }
+
+    public void setCreditCode(String creditCode) {
+        this.creditCode = creditCode;
     }
 }

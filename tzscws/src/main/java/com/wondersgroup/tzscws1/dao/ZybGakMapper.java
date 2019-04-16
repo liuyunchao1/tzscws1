@@ -71,4 +71,11 @@ public interface ZybGakMapper {
      * @return
      */
     List<ZybGak> selectByParams(@Param("params") Map<String, Object> params);
+
+    /**
+     * 批量插入
+     * @param zybGakList
+     * @return
+     */
+    boolean insertBatch(List<ZybGak> zybGakList);
 }

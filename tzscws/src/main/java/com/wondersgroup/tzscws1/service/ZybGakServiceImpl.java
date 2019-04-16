@@ -41,4 +41,8 @@ public class ZybGakServiceImpl implements ZybGakService{
     public int updateByPrimaryKeySelective(ZybGak record) {
         return zybGakMapper.updateByPrimaryKeySelective(record);
     }
+    @Override
+    public boolean insertBatch(List<ZybGak> zybGakList){
+            return zybGakMapper.insertBatch(zybGakList);
+    }
 }

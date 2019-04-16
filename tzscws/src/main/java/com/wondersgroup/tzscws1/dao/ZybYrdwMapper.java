@@ -72,4 +72,15 @@ public interface ZybYrdwMapper {
      * @return
      */
     List<ZybYrdw> selectByNameList(@Param("nameList") List<String> nameList);
+    /**
+     * 根据creditCode查找
+     */
+    ZybYrdw selectByCreditCode(String creditCode);
+
+    /**
+     * 批量插入
+     * @param zybYrdwList
+     * @return
+     */
+    boolean insertBatch(List<ZybYrdw> zybYrdwList);
 }

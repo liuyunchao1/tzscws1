@@ -33,4 +33,11 @@ public interface ZybGakService {
      * @return
      */
     int updateByPrimaryKeySelective(ZybGak record);
+
+    /**
+     * 批量插入
+     * @param zybGakList
+     * @return
+     */
+    boolean insertBatch(List<ZybGak> zybGakList);
 }
