@@ -437,12 +437,13 @@ public class ProvincialPlatformServiceImpl implements ProvincialPlatformService 
         String returnCode = resultMap.get("returnCode") != null ? resultMap.get("returnCode").toString() : "";  // 返回码
         ZybGak updateObj;
         Date updateDate = new Date();
+
         if ("0".equals(returnCode)) { // 上传成功
             for (ZybGak gak : list) {
                 updateObj = new ZybGak();
                 updateObj.setId(gak.getId());
-                updateObj.setSbbz("1");
                 updateObj.setSbsj(updateDate);
+                updateObj.setSbbz("1");
                 zybGakMapper.updateByPrimaryKeySelective(updateObj);
                 resultNum.put(Constant.SUC_NUM, resultNum.get(Constant.SUC_NUM) + 1);
             }
@@ -452,15 +453,35 @@ public class ProvincialPlatformServiceImpl implements ProvincialPlatformService 
         // 上传失败时，更新状态和原因，如果某个案卡有单独返回的错误原因，则更新成此原因，如果没有，则更新成总的message
         String message = resultMap.get("message") != null ? resultMap.get("message").toString() : "";   // 错误说明
         Map<String, String> errorDataMap = resultMap.containsKey("errorDataMap") ? (Map<String, String>) resultMap.get("errorDataMap") : null;  // 每条个案卡数据的错误消息
-        for (ZybGak gak : list) {
-            updateObj = new ZybGak();
-            updateObj.setId(gak.getId());
-            updateObj.setSbbz("2");
-            updateObj.setSbsj(updateDate);
-            updateObj.setSbyy((errorDataMap != null && errorDataMap.containsKey(gak.getCode() + gak.getHosId())) ? errorDataMap.get(gak.getCode() + gak.getHosId()) : message);
-            zybGakMapper.updateByPrimaryKeySelective(updateObj);
-            resultNum.put(Constant.FAI_NUM, resultNum.get(Constant.FAI_NUM) + 1);
+
+        if ("-1".equals(returnCode)) { // resultCode为-1时，代表部分成功，部分失败
+            for (ZybGak gak : list) {
+                updateObj = new ZybGak();
+                updateObj.setId(gak.getId());
+                updateObj.setSbsj(updateDate);
+                if (errorDataMap != null && errorDataMap.containsKey(gak.getCode() + gak.getHosId())) { // 失败的数据
+                    updateObj.setSbbz("2");
+                    updateObj.setSbyy(errorDataMap.get(gak.getCode() + gak.getHosId()));
+                    zybGakMapper.updateByPrimaryKeySelective(updateObj);
+                    resultNum.put(Constant.FAI_NUM, resultNum.get(Constant.FAI_NUM) + 1);
+                } else {    // 成功的数据
+                    updateObj.setSbbz("1");
+                    zybGakMapper.updateByPrimaryKeySelective(updateObj);
+                    resultNum.put(Constant.SUC_NUM, resultNum.get(Constant.SUC_NUM) + 1);
+                }
+            }
+        } else {    // 全部失败
+            for (ZybGak gak : list) {
+                updateObj = new ZybGak();
+                updateObj.setId(gak.getId());
+                updateObj.setSbbz("2");
+                updateObj.setSbsj(updateDate);
+                updateObj.setSbyy(message);
+                zybGakMapper.updateByPrimaryKeySelective(updateObj);
+                resultNum.put(Constant.FAI_NUM, resultNum.get(Constant.FAI_NUM) + 1);
+            }
         }
+
         return resultNum;
     }
 
