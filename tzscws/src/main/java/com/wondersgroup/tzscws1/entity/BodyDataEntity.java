@@ -44,6 +44,10 @@ public class BodyDataEntity {
     private String PLTUnitName;
     private String PLTMiniRange;
     private String PLTMaxRange;
+    private String BGLUResult;
+    private String BGLUUnitName;
+    private String BGLUMiniRange;
+    private String BGLUMaxRange;
     private String GLUResult;
     private String GLUUnitName;
     private String GLUMiniRange;
@@ -1038,5 +1042,37 @@ public class BodyDataEntity {
 
     public void setCreditCode(String creditCode) {
         this.creditCode = creditCode;
+    }
+
+    public String getBGLUResult() {
+        return BGLUResult;
+    }
+
+    public String getBGLUUnitName() {
+        return BGLUUnitName;
+    }
+
+    public String getBGLUMiniRange() {
+        return BGLUMiniRange;
+    }
+
+    public String getBGLUMaxRange() {
+        return BGLUMaxRange;
+    }
+
+    public void setBGLUResult(String BGLUResult) {
+        this.BGLUResult = BGLUResult;
+    }
+
+    public void setBGLUUnitName(String BGLUUnitName) {
+        this.BGLUUnitName = BGLUUnitName;
+    }
+
+    public void setBGLUMiniRange(String BGLUMiniRange) {
+        this.BGLUMiniRange = BGLUMiniRange;
+    }
+
+    public void setBGLUMaxRange(String BGLUMaxRange) {
+        this.BGLUMaxRange = BGLUMaxRange;
     }
 }

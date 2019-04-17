@@ -280,6 +280,10 @@ public class ReadStringXmlController {
              String PLTUnitNameResult= "";
              String PLTMiniRangeResult= "";
              String PLTMaxRangeResult= "";
+             String BGLUResult= "";
+             String BGLUUnitName= "";
+             String BGLUMiniRange= "";
+             String BGLUMaxRange= "";
              String GLUResult= "";
              String GLUUnitNameResult= "";
              String GLUMiniRangeResult= "";
@@ -443,6 +447,14 @@ public class ReadStringXmlController {
                 bodyDataEntity.setPLTMiniRange(PLTMiniRangeResult);
                 PLTMaxRangeResult = recordEless.elementTextTrim("PLTMaxRange");
                 bodyDataEntity.setPLTMaxRange(PLTMaxRangeResult);
+                BGLUResult = recordEless.elementTextTrim("BGLUResult");
+                bodyDataEntity.setBGLUResult(BGLUResult);
+                BGLUUnitName = recordEless.elementTextTrim("BGLUUnitName");
+                bodyDataEntity.setBGLUUnitName(BGLUUnitName);
+                BGLUMiniRange = recordEless.elementTextTrim("BGLUMiniRange");
+                bodyDataEntity.setBGLUMiniRange(BGLUMiniRange);
+                BGLUMaxRange = recordEless.elementTextTrim("BGLUMaxRange");
+                bodyDataEntity.setBGLUMaxRange(BGLUMaxRange);
                 GLUResult = recordEless.elementTextTrim("GLUResult");
                 bodyDataEntity.setGLUResult(GLUResult);
                 GLUUnitNameResult = recordEless.elementTextTrim("GLUUnitName");
@@ -625,7 +637,7 @@ public class ReadStringXmlController {
                 }
                 if(StringUtils.isEmpty(sysPressResult)){
                     returnCode.setText("105");
-                    message.setText("个案卡请求参数sysPressResult为空值!!");
+                    message.setText("个案卡请求参数sysPressResult为空值!");
                     logger.info("个案卡请求参数sysPressResult为空值:" + retDoc.asXML());
                     return retDoc.asXML();
                 }
@@ -657,16 +669,6 @@ public class ReadStringXmlController {
                     returnCode.setText("105");
                     message.setText("个案卡请求参数employerName为空值!!");
                     logger.info("个案卡请求参数employerName为空值:" + retDoc.asXML());
-                    return retDoc.asXML();
-                }
-
-
-                boolean empFlag = checkStringIsNull( codeResult,hosIdResult, nameResult, idcardResult, bodyCheckTypeResult, bodyCheckTimeResult, sexCodeResult, birthdayResult, hazardCodeResult, hazardYearResult, hazardMonthResult, sysPressResult, diasPressResult, ECGCodeResult, conclusionsCodeResult,orgCodeResult,employerNameResult);
-                if (empFlag) {
-                    returnCode.setText("105");
-                    message.setText("ReportCard必填请求参数有空值!");
-                    logger.info("ReportCard必填请求参数有空值!");
-                    logger.info("ReportCard必填请求参数有空值:" + retDoc.asXML());
                     return retDoc.asXML();
                 }
                 //sexCode性别代码表
@@ -863,6 +865,10 @@ public class ReadStringXmlController {
                 zybGak.setPltUnitName(PLTUnitNameResult);
                 zybGak.setPltMaxRange(PLTMaxRangeResult);
                 zybGak.setPltMiniRange(PLTMiniRangeResult);
+                zybGak.setBgluResult(BGLUResult);
+                zybGak.setBgluUnitName(BGLUUnitName);
+                zybGak.setBgluMaxRange(BGLUMaxRange);
+                zybGak.setBgluMiniRange(BGLUMiniRange);
                 zybGak.setGluResult(GLUResult);
                 zybGak.setGluUnitName(GLUUnitNameResult);
                 zybGak.setGluMiniRange(GLUMiniRangeResult);
@@ -1388,12 +1394,14 @@ public class ReadStringXmlController {
                 }
                 //判断接触监测的主要职业病危害因素编码hazardCode格式
                 String hazardCode = reportCard.getHazardCode();
-                logger.info("===hazardCode==="+hazardCode);
+                //保存危害因素后面校验用
+                List<String> hazardList = new ArrayList<String>();
                 //判断hazardCodeList是否在字典值域内
                 List<CodeInfo> hazardCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(900));
                 boolean hazardCodeInflag = false;
                 if (!StringUtils.isEmpty(hazardCode)) {
                         if (hazardCode.indexOf(",") == -1) {
+                            hazardList.add(hazardCode);
                             boolean formatHazardCodeFlag = CommonUtils.isLetterDigit(hazardCode);
                             boolean formatHazardCodeLenFlag = CommonUtils.isMaxLength(hazardCode, 32);
                             if (!(formatHazardCodeFlag && formatHazardCodeLenFlag)) {
@@ -1417,6 +1425,7 @@ public class ReadStringXmlController {
                                 String[] hazardCodSize = hazardCode.split(",");
                                 boolean formatHazardCodeLenFlag = CommonUtils.isMaxLength(hazardCode, 32);
                                 for (int i = 0; i < hazardCodSize.length; i++) {
+                                    hazardList.add(hazardCodSize[i]);
                                     boolean formatHazardCodeFlag = CommonUtils.isLetterDigit(hazardCodSize[i]);
                                     if (!(formatHazardCodeFlag && formatHazardCodeLenFlag)) {
                                         Element errorData = errorReportCards.addElement("errorData");
@@ -1581,7 +1590,7 @@ public class ReadStringXmlController {
 
                 }
                 //判断WBCResult血常规白细胞计数（WBC）结果
-                if (hazardCodeInflag && ("铅".equals(reportCard.getWBCResult()) || "苯".equals(reportCard.getWBCResult()) || "布鲁氏菌".equals(reportCard.getWBCResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getWBCResult())){
                     boolean formatWBCResultFlag = CommonUtils.isCNChar(reportCard.getWBCResult());
                     boolean formatWBCResultLenFlag = CommonUtils.isMaxLength(reportCard.getWBCResult(), 8);
                     if (!(formatWBCResultFlag && formatWBCResultLenFlag)) {
@@ -1592,6 +1601,20 @@ public class ReadStringXmlController {
                         errorMessage.setText("血常规白细胞计数(WBC)结果格式不正确!");
                         flag = false;
                     }
+                } else{
+                        for(String hazard:hazardList){
+                            logger.info("====hazard===="+hazard);
+                            if("铅".equals(hazard) || "苯".equals(hazard) || "布鲁氏菌".equals(hazard)) {
+                                logger.info("血常规白细胞计数(WBC)结果不能为空!");
+                                Element errorData = errorReportCards.addElement("errorData");
+                                Element errorMessage = errorData.addElement("errorMessage");
+                                Element reportCardId = errorData.addElement("reportCard");
+                                reportCardId.setText(reportCard.getCode());
+                                errorMessage.setText("血常规白细胞计数(WBC)结果不能为空!");
+                                flag = false;
+                                break;
+                            }
+                        }
                 }
                 //判断WBCUnitName血常规白细胞计数（WBC）计量单位名称
                 if (!StringUtils.isEmpty(reportCard.getWBCUnitName())) {
@@ -1636,7 +1659,7 @@ public class ReadStringXmlController {
 
                 }
                 //判断RBCResult血常规红细胞计数（RBC）结果
-                if (hazardCodeInflag && ("铅".equals(reportCard.getRBCResult()) || "苯".equals(reportCard.getRBCResult()) || "布鲁氏菌".equals(reportCard.getRBCResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getRBCResult())){
                     boolean formatRBCResultFlag = CommonUtils.isCNChar(reportCard.getRBCResult());
                     boolean formatRBCResultLenFlag = CommonUtils.isMaxLength(reportCard.getRBCResult(), 8);
                     if (!(formatRBCResultFlag && formatRBCResultLenFlag)) {
@@ -1646,6 +1669,18 @@ public class ReadStringXmlController {
                         reportCardId.setText(reportCard.getCode());
                         errorMessage.setText("血常规红细胞计数(RBC)结果格式不正确!");
                         flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("铅".equals(hazard) || "苯".equals(hazard) || "布鲁氏菌".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("血常规红细胞计数(RBC)结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
                 //判断RBCUnitName血常规红细胞计数（RBC）计量单位名称
@@ -1744,7 +1779,7 @@ public class ReadStringXmlController {
                     }
                 }
                 //判断PLTResult血常规血小板计数（PLT）结果
-                if (hazardCodeInflag && ("铅".equals(reportCard.getPLTResult()) || "苯".equals(reportCard.getPLTResult()) || "布鲁氏菌".equals(reportCard.getPLTResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getPLTResult())){
                     boolean formatPLTResultFlag = CommonUtils.isCNChar(reportCard.getPLTResult());
                     boolean formatPLTResultLenFlag = CommonUtils.isMaxLength(reportCard.getPLTResult(), 8);
                     if (!(formatPLTResultFlag && formatPLTResultLenFlag)) {
@@ -1754,6 +1789,18 @@ public class ReadStringXmlController {
                         reportCardId.setText(reportCard.getCode());
                         errorMessage.setText("血常规血小板计数（PLT）结果格式不正确!");
                         flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("铅".equals(hazard) || "苯".equals(hazard) || "布鲁氏菌".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("血常规血小板计数（PLT）结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
                 //判断PLTUnitName血常规血小板计数（PLT）计量单位名称
@@ -1795,8 +1842,72 @@ public class ReadStringXmlController {
                         flag = false;
                     }
                 }
+                //判断BGLUResult血常规血糖（GLU）结果
+                if(!StringUtils.isEmpty(reportCard.getBGLUResult())){
+                    boolean formatPLTResultFlag = CommonUtils.isCNChar(reportCard.getPLTResult());
+                    boolean formatPLTResultLenFlag = CommonUtils.isMaxLength(reportCard.getPLTResult(), 8);
+                    if (!(formatPLTResultFlag && formatPLTResultLenFlag)) {
+                        Element errorData = errorReportCards.addElement("errorData");
+                        Element errorMessage = errorData.addElement("errorMessage");
+                        Element reportCardId = errorData.addElement("reportCard");
+                        reportCardId.setText(reportCard.getCode());
+                        errorMessage.setText("血常规血糖（GLU）结果格式不正确!");
+                        flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("正己烷".equals(hazard) || "高温".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("血常规血糖（GLU）结果不能为空!");
+                            flag = false;
+                            break;
+                        }
+                    }
+                }
+                //BGLUUnitName血常规血糖（GLU）计量单位名称
+                if (!StringUtils.isEmpty(reportCard.getBGLUUnitName())) {
+                    boolean formatBGLUUnitNameFlag = CommonUtils.isCNChar(reportCard.getBGLUUnitName());
+                    boolean formatBGLUUnitNameLenFlag = CommonUtils.isMaxLength(reportCard.getBGLUUnitName(), 16);
+                    if (!(formatBGLUUnitNameFlag && formatBGLUUnitNameLenFlag)) {
+                        Element errorData = errorReportCards.addElement("errorData");
+                        Element errorMessage = errorData.addElement("errorMessage");
+                        Element reportCardId = errorData.addElement("reportCard");
+                        reportCardId.setText(reportCard.getCode());
+                        errorMessage.setText("血常规血糖（GLU）计量单位名称格式不正确!");
+                        flag = false;
+                    }
+                }
+                //BGLUMiniRange血常规血糖（GLU）参考范围最小值
+                if (!StringUtils.isEmpty(reportCard.getBGLUMiniRange())) {
+                    boolean formatBGLUMiniRangeFlag = CommonUtils.isCNChar(reportCard.getBGLUMiniRange());
+                    boolean formatBGLUMiniRangeLenFlag = CommonUtils.isMaxLength(reportCard.getBGLUMiniRange(), 16);
+                    if (!(formatBGLUMiniRangeFlag && formatBGLUMiniRangeLenFlag)) {
+                        Element errorData = errorReportCards.addElement("errorData");
+                        Element errorMessage = errorData.addElement("errorMessage");
+                        Element reportCardId = errorData.addElement("reportCard");
+                        reportCardId.setText(reportCard.getCode());
+                        errorMessage.setText("血常规血糖（GLU）参考范围最小值格式不正确!");
+                        flag = false;
+                    }
+                }
+                //BGLUMaxRange血常规血糖（GLU）参考范围最大值
+                if (!StringUtils.isEmpty(reportCard.getBGLUMaxRange())) {
+                    boolean formatBGLUMaxRangeFlag = CommonUtils.isCNChar(reportCard.getBGLUMaxRange());
+                    boolean formatBGLUMaxRangeLenFlag = CommonUtils.isMaxLength(reportCard.getBGLUMaxRange(), 16);
+                    if (!(formatBGLUMaxRangeFlag && formatBGLUMaxRangeLenFlag)) {
+                        Element errorData = errorReportCards.addElement("errorData");
+                        Element errorMessage = errorData.addElement("errorMessage");
+                        Element reportCardId = errorData.addElement("reportCard");
+                        reportCardId.setText(reportCard.getCode());
+                        errorMessage.setText("血常规血糖（GLU）参考范围最大值格式不正确!");
+                        flag = false;
+                    }
+                }
                 //GLUResult尿常规尿糖（GLU）结果
-                if (hazardCodeInflag && ("铅".equals(reportCard.getGLUResult()) || "苯".equals(reportCard.getGLUResult()) || "布鲁氏菌".equals(reportCard.getGLUResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getGLUResult())){
                     boolean formatGLUResultFlag = CommonUtils.isCNChar(reportCard.getGLUResult());
                     boolean formatGLUResultLenFlag = CommonUtils.isMaxLength(reportCard.getGLUResult(), 8);
                     if (!(formatGLUResultFlag && formatGLUResultLenFlag)) {
@@ -1804,10 +1915,21 @@ public class ReadStringXmlController {
                         Element errorMessage = errorData.addElement("errorMessage");
                         Element reportCardId = errorData.addElement("reportCard");
                         reportCardId.setText(reportCard.getCode());
-                        errorMessage.setText("血常规血小板计数（PLT）结果格式不正确!");
+                        errorMessage.setText("尿常规尿糖（GLU）结果格式不正确!");
                         flag = false;
                     }
-
+                } else{
+                    for(String hazard:hazardList){
+                        if("正己烷".equals(hazard) || "高温".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("尿常规尿糖（GLU）结果不能为空!");
+                            flag = false;
+                            break;
+                        }
+                    }
                 }
                 //GLUUnitName尿常规尿糖（GLU）计量单位
                 if (!StringUtils.isEmpty(reportCard.getGLUUnitName())) {
@@ -1849,7 +1971,7 @@ public class ReadStringXmlController {
                     }
                 }
                 //PROResult尿常规尿蛋白（PRO）结果
-                if (!StringUtils.isEmpty(reportCard.getPROResult())) {
+                if(!StringUtils.isEmpty(reportCard.getPROResult())){
                     boolean formatPROResultFlag = CommonUtils.isCNChar(reportCard.getPROResult());
                     boolean formatPROResultLenFlag = CommonUtils.isMaxLength(reportCard.getPROResult(), 8);
                     if (!(formatPROResultFlag && formatPROResultLenFlag)) {
@@ -1859,6 +1981,18 @@ public class ReadStringXmlController {
                         reportCardId.setText(reportCard.getCode());
                         errorMessage.setText("尿常规尿蛋白（PRO）结果格式不正确!");
                         flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("铅".equals(hazard) || "布鲁氏菌".equals(hazard)|| "苯".equals(hazard)|| "正己烷".equals(hazard) || "高温".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("尿常规尿蛋白（PRO）结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
                 //PROUnitName尿常规尿蛋白（PRO）计量单位名称
@@ -1901,7 +2035,7 @@ public class ReadStringXmlController {
                     }
                 }
                 //UWBCResult尿常规白细胞（WBC）结果
-                if (hazardCodeInflag && ("铅".equals(reportCard.getUWBCResult()) || "苯".equals(reportCard.getUWBCResult()) || "布鲁氏菌".equals(reportCard.getUWBCResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getUWBCResult())){
                     boolean formatUWBCResultFlag = CommonUtils.isCNChar(reportCard.getUWBCResult());
                     boolean formatUWBCResultLenFlag = CommonUtils.isMaxLength(reportCard.getUWBCResult(), 8);
                     if (!(formatUWBCResultFlag && formatUWBCResultLenFlag)) {
@@ -1912,7 +2046,18 @@ public class ReadStringXmlController {
                         errorMessage.setText("尿常规白细胞（WBC）结果格式不正确!");
                         flag = false;
                     }
-
+                } else{
+                    for(String hazard:hazardList){
+                        if("铅".equals(hazard) || "布鲁氏菌".equals(hazard)|| "苯".equals(hazard)|| "正己烷".equals(hazard) || "高温".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("尿常规白细胞（WBC）结果不能为空!");
+                            flag = false;
+                            break;
+                        }
+                    }
                 }
                 //UWBCUnitName尿常规白细胞（WBC）计量单位名称
                 if (!StringUtils.isEmpty(reportCard.getUWBCUnitName())) {
@@ -1954,18 +2099,29 @@ public class ReadStringXmlController {
                     }
                 }
                 //BLDResult尿常规尿潜血（BLD）结果
-                if (hazardCodeInflag && ("铅".equals(reportCard.getBLDResult()) || "苯".equals(reportCard.getBLDResult()) || "布鲁氏菌".equals(reportCard.getBLDResult()))) {
-                    boolean formatUWBCResultFlag = CommonUtils.isCNChar(reportCard.getUWBCResult());
-                    boolean formatUWBCResultLenFlag = CommonUtils.isMaxLength(reportCard.getUWBCResult(), 8);
-                    if (!(formatUWBCResultFlag && formatUWBCResultLenFlag)) {
+                if(!StringUtils.isEmpty(reportCard.getBLDResult())){
+                    boolean formatBLDResultFlag = CommonUtils.isCNChar(reportCard.getBLDResult());
+                    boolean formatBLDResultLenFlag = CommonUtils.isMaxLength(reportCard.getBLDResult(), 8);
+                    if (!(formatBLDResultFlag && formatBLDResultLenFlag)) {
                         Element errorData = errorReportCards.addElement("errorData");
                         Element errorMessage = errorData.addElement("errorMessage");
                         Element reportCardId = errorData.addElement("reportCard");
                         reportCardId.setText(reportCard.getCode());
-                        errorMessage.setText("尿常规白细胞（WBC）结果格式不正确!");
+                        errorMessage.setText("尿常规尿潜血（BLD）结果格式不正确!");
                         flag = false;
                     }
-
+                } else{
+                    for(String hazard:hazardList){
+                        if("铅".equals(hazard) || "布鲁氏菌".equals(hazard)|| "苯".equals(hazard)|| "正己烷".equals(hazard) || "高温".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("尿常规尿潜血（BLD）结果不能为空!");
+                            flag = false;
+                            break;
+                        }
+                    }
                 }
                 //BLDUnitName尿常规尿潜血（BLD）计量单位名称
                 if (!StringUtils.isEmpty(reportCard.getBLDUnitName())) {
@@ -2007,7 +2163,7 @@ public class ReadStringXmlController {
                     }
                 }
                 //ALTResult肝功能谷丙转氨酶（ALT）结果
-                if (hazardCodeInflag && ("铅".equals(reportCard.getALTResult()) || "苯".equals(reportCard.getALTResult()) || "布鲁氏菌".equals(reportCard.getALTResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getALTResult())){
                     boolean formatALTResultFlag = CommonUtils.isCNChar(reportCard.getALTResult());
                     boolean formatALTResultLenFlag = CommonUtils.isMaxLength(reportCard.getALTResult(), 8);
                     if (!(formatALTResultFlag && formatALTResultLenFlag)) {
@@ -2017,6 +2173,18 @@ public class ReadStringXmlController {
                         reportCardId.setText(reportCard.getCode());
                         errorMessage.setText("肝功能谷丙转氨酶（ALT）结果格式不正确!");
                         flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("布鲁氏菌".equals(hazard)|| "苯".equals(hazard)|| "正己烷".equals(hazard) || "高温".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("尿常规尿潜血（BLD）结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
                 //ALTUnitName肝功能谷丙转氨酶（ALT）计量单位名称
@@ -2060,10 +2228,16 @@ public class ReadStringXmlController {
                 }
                 //ECGCode心电图编码
                 String eCGCode = reportCard.getECGCode();
+                List<CodeInfo> eCGCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(902));
                 if (eCGCode.indexOf(",") == -1) {
-                    boolean formatHECGCodeFlag = CommonUtils.isLetterDigit(eCGCode);
-                    boolean formatECGCodeLenFlag = CommonUtils.isMaxLength(eCGCode, 255);
-                    if (!(formatHECGCodeFlag && formatECGCodeLenFlag)) {
+                    boolean cHESTCodeListInflag = false;
+                    for (CodeInfo codeInfo : eCGCodeList) {
+                        if (eCGCode.equals(codeInfo.getCode())) {
+                            cHESTCodeListInflag = true;
+                            break;
+                        }
+                    }
+                    if (!cHESTCodeListInflag) {
                         Element errorData = errorReportCards.addElement("errorData");
                         Element errorMessage = errorData.addElement("errorMessage");
                         Element reportCardId = errorData.addElement("reportCard");
@@ -2071,13 +2245,28 @@ public class ReadStringXmlController {
                         errorMessage.setText("心电图编码格式不正确!");
                         flag = false;
                     }
-
                 } else {
-                    String[] eCGCodeList = eCGCode.split(",");
+                    String[] eCGCodeSize = eCGCode.split(",");
                     boolean formatHazardCodeLenFlag = CommonUtils.isMaxLength(eCGCode, 255);
-                    for (int i = 0; i < eCGCodeList.length; i++) {
-                        boolean formatHazardCodeFlag = CommonUtils.isLetterDigit(eCGCodeList[i]);
-                        if (!(formatHazardCodeFlag && formatHazardCodeLenFlag)) {
+                    if(formatHazardCodeLenFlag){
+                        boolean[] cHESTCodeListInflag = new boolean[eCGCodeSize.length];
+                        for (int i = 0; i < eCGCodeSize.length; i++) {
+                            cHESTCodeListInflag[i]=false;
+                            for (CodeInfo codeInfo : eCGCodeList) {
+                                if (eCGCodeSize[i].equals(codeInfo.getCode())) {
+                                    cHESTCodeListInflag[i] = true;
+                                    break;
+                                }
+                            }
+                        }
+                        boolean CHESTCodeflag = true;
+                        for(Boolean cHESTCodeflag:cHESTCodeListInflag){
+                            if(!cHESTCodeflag){
+                                CHESTCodeflag=false;
+                                break;
+                            }
+                        }
+                        if(!CHESTCodeflag){
                             Element errorData = errorReportCards.addElement("errorData");
                             Element errorMessage = errorData.addElement("errorMessage");
                             Element reportCardId = errorData.addElement("reportCard");
@@ -2086,32 +2275,29 @@ public class ReadStringXmlController {
                             flag = false;
                             break;
                         }
+                    }else{
+                        Element errorData = errorReportCards.addElement("errorData");
+                        Element errorMessage = errorData.addElement("errorMessage");
+                        Element reportCardId = errorData.addElement("reportCard");
+                        reportCardId.setText(reportCard.getCode());
+                        errorMessage.setText("心电图编码格式不正确!");
+                        flag = false;
                     }
                 }
-                //判断ECGCode是否在字典值域内
-                List<CodeInfo> eCGCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(902));
-                boolean eCGCodeInflag = false;
-                for (CodeInfo codeInfo : eCGCodeList) {
-                    if (reportCard.getECGCode().equals(codeInfo.getCode())) {
-                        eCGCodeInflag = true;
-                        break;
-                    }
-                }
-                if (!eCGCodeInflag) {
-                    Element errorData = errorReportCards.addElement("errorData");
-                    Element errorMessage = errorData.addElement("errorMessage");
-                    Element reportCardId = errorData.addElement("reportCard");
-                    reportCardId.setText(reportCard.getCode());
-                    errorMessage.setText("ECGCode心电图编码值不正确!");
-                    flag = false;
-                }
+
                 //CHESTCode胸片编码
                 String cHESTCode = reportCard.getCHESTCode();
-                if (hazardCodeInflag && ("矽尘".equals(reportCard.getCHESTCode()) || "煤尘(煤矽尘)".equals(reportCard.getCHESTCode()) || "石棉".equals(reportCard.getCHESTCode())))
-                    if (cHESTCode.indexOf(",") == -1) {
-                        boolean formatHECGCodeFlag = CommonUtils.isLetterDigit(cHESTCode);
-                        boolean formatECGCodeLenFlag = CommonUtils.isMaxLength(cHESTCode, 255);
-                        if (!(formatHECGCodeFlag && formatECGCodeLenFlag)) {
+                List<CodeInfo> cHESTCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(903));
+                if(!StringUtils.isEmpty(cHESTCode)){
+                    if(cHESTCode.indexOf(",") == -1){
+                        boolean cHESTCodeListInflag = false;
+                        for (CodeInfo codeInfo : cHESTCodeList) {
+                            if (cHESTCode.equals(codeInfo.getCode())) {
+                                cHESTCodeListInflag = true;
+                                break;
+                            }
+                        }
+                        if (!cHESTCodeListInflag) {
                             Element errorData = errorReportCards.addElement("errorData");
                             Element errorMessage = errorData.addElement("errorMessage");
                             Element reportCardId = errorData.addElement("reportCard");
@@ -2120,40 +2306,59 @@ public class ReadStringXmlController {
                             flag = false;
                         }
                     } else {
-                        String[] cHESTCodeList = cHESTCode.split(",");
+                        String[] cHESTCodeSize = cHESTCode.split(",");
                         boolean formatHazardCodeLenFlag = CommonUtils.isMaxLength(eCGCode, 255);
-                        for (int i = 0; i < cHESTCodeList.length; i++) {
-                            boolean formatHazardCodeFlag = CommonUtils.isLetterDigit(cHESTCodeList[i]);
-                            if (!(formatHazardCodeFlag && formatHazardCodeLenFlag)) {
+                        if(formatHazardCodeLenFlag){
+                            boolean[] cHESTCodeListInflag = new boolean[cHESTCodeSize.length];
+                            for (int i = 0; i < cHESTCodeSize.length; i++) {
+                                cHESTCodeListInflag[i]=false;
+                                for (CodeInfo codeInfo : cHESTCodeList) {
+                                    if (cHESTCodeSize[i].equals(codeInfo.getCode())) {
+                                        cHESTCodeListInflag[i] = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            boolean CHESTCodeflag = true;
+                            for(Boolean cHESTCodeflag:cHESTCodeListInflag){
+                                if(!cHESTCodeflag){
+                                    CHESTCodeflag=false;
+                                    break;
+                                }
+                            }
+                            if(!CHESTCodeflag){
                                 Element errorData = errorReportCards.addElement("errorData");
                                 Element errorMessage = errorData.addElement("errorMessage");
                                 Element reportCardId = errorData.addElement("reportCard");
                                 reportCardId.setText(reportCard.getCode());
-                                errorMessage.setText("胸片编码格式格式不正确!");
+                                errorMessage.setText("胸片编码格式不正确!");
                                 flag = false;
                                 break;
                             }
+                        }else{
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("胸片编码格式格式不正确!");
+                            flag = false;
                         }
                     }
-                //判断ECGCodeList是否在字典值域内
-                List<CodeInfo> cHESTCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(903));
-                boolean cHESTCodeListInflag = false;
-                for (CodeInfo codeInfo : cHESTCodeList) {
-                    if (reportCard.getHazardCode().equals(codeInfo.getCode())) {
-                        cHESTCodeListInflag = true;
-                        break;
+                }else{
+                    for(String hazard:hazardList){
+                        if("矽尘".equals(hazard)|| "煤尘(煤矽尘)".equals(hazard)|| "石棉".equals(hazard) || "电焊烟尘".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("尿常规尿潜血（BLD）结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
-                if (!hazardCodeInflag) {
-                    Element errorData = errorReportCards.addElement("errorData");
-                    Element errorMessage = errorData.addElement("errorMessage");
-                    Element reportCardId = errorData.addElement("reportCard");
-                    reportCardId.setText(reportCard.getCode());
-                    errorMessage.setText("ECGCode心电图编码值不正确!");
-                    flag = false;
-                }
                 //FVCResult肺功能FVC结果
-                if (hazardCodeInflag && ("矽尘".equals(reportCard.getFVCResult()) || "煤尘(煤矽尘)".equals(reportCard.getFVCResult()) || "石棉".equals(reportCard.getFVCResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getFVCResult())){
                     boolean formatFVCResultFlag = CommonUtils.isCNChar(reportCard.getFVCResult());
                     boolean formatFVCResultLenFlag = CommonUtils.isMaxLength(reportCard.getFVCResult(), 8);
                     if (!(formatFVCResultFlag && formatFVCResultLenFlag)) {
@@ -2163,6 +2368,18 @@ public class ReadStringXmlController {
                         reportCardId.setText(reportCard.getCode());
                         errorMessage.setText("肺功能FVC结果格式不正确!");
                         flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("矽尘".equals(hazard) || "煤尘(煤矽尘)".equals(hazard)|| "石棉".equals(hazard)|| "电焊烟尘".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("肺功能FVC结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
                 //FVCUnitName肺功能FVC计量单位名称
@@ -2205,7 +2422,7 @@ public class ReadStringXmlController {
                     }
                 }
                 //FEV1Result肺功能FEV1结果
-                if (hazardCodeInflag && ("矽尘".equals(reportCard.getFEV1Result()) || "煤尘(煤矽尘)".equals(reportCard.getFEV1Result()) || "石棉".equals(reportCard.getFEV1Result()))) {
+                if(!StringUtils.isEmpty(reportCard.getFEV1Result())){
                     boolean formatFEV1ResultFlag = CommonUtils.isCNChar(reportCard.getFEV1Result());
                     boolean formatFEV1ResultLenFlag = CommonUtils.isMaxLength(reportCard.getFEV1Result(), 8);
                     if (!(formatFEV1ResultFlag && formatFEV1ResultLenFlag)) {
@@ -2215,6 +2432,18 @@ public class ReadStringXmlController {
                         reportCardId.setText(reportCard.getCode());
                         errorMessage.setText("肺功能FEV1结果格式不正确!");
                         flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("矽尘".equals(hazard) || "煤尘(煤矽尘)".equals(hazard)|| "石棉".equals(hazard)|| "电焊烟尘".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("肺功能FEV1结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
                 //FEV1UnitName肺功能FEV1计量单位名称
@@ -2257,7 +2486,7 @@ public class ReadStringXmlController {
                     }
                 }
                 //FEV1FVCResult肺功能FEV1/FVC结果
-                if (hazardCodeInflag && ("矽尘".equals(reportCard.getFEV1FVCResult()) || "煤尘(煤矽尘)".equals(reportCard.getFEV1FVCResult()) || "石棉".equals(reportCard.getFEV1FVCResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getFEV1FVCResult())){
                     boolean formatFEV1FVCResultFlag = CommonUtils.isCNChar(reportCard.getFEV1FVCResult());
                     boolean formatFEV1FVCResultLenFlag = CommonUtils.isMaxLength(reportCard.getFEV1FVCResult(), 8);
                     if (!(formatFEV1FVCResultFlag && formatFEV1FVCResultLenFlag)) {
@@ -2267,6 +2496,18 @@ public class ReadStringXmlController {
                         reportCardId.setText(reportCard.getCode());
                         errorMessage.setText("肺功能FEV1/FVC结果格式不正确!");
                         flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("矽尘".equals(hazard) || "煤尘(煤矽尘)".equals(hazard)|| "石棉".equals(hazard)|| "电焊烟尘".equals(hazard)) {
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("肺功能FEV1/FVC结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
                 //FEV1FVCUnitName肺功能FEV1/FVC计量
@@ -2309,7 +2550,7 @@ public class ReadStringXmlController {
                     }
                 }
                 //BLeadResult血铅结果
-                if (hazardCodeInflag && ("铅".equals(reportCard.getBLeadResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getBLeadResult())){
                     boolean formatBLeadResultFlag = CommonUtils.isCNChar(reportCard.getBLeadResult());
                     boolean formatBLeadResultLenFlag = CommonUtils.isMaxLength(reportCard.getBLeadResult(), 8);
                     if (!(formatBLeadResultFlag && formatBLeadResultLenFlag)) {
@@ -2319,6 +2560,18 @@ public class ReadStringXmlController {
                         reportCardId.setText(reportCard.getCode());
                         errorMessage.setText("血铅结果格式不正确!");
                         flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("铅".equals(hazard)){
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("血铅结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
                 //BLeadUnitName血铅计量单位名称
@@ -2361,7 +2614,7 @@ public class ReadStringXmlController {
                     }
                 }
                 //ULeadResult尿铅结果
-                if (hazardCodeInflag && ("铅".equals(reportCard.getULeadResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getULeadResult())){
                     boolean formatULeadResultFlag = CommonUtils.isCNChar(reportCard.getULeadResult());
                     boolean formatULeadResultLenFlag = CommonUtils.isMaxLength(reportCard.getULeadResult(), 8);
                     if (!(formatULeadResultFlag && formatULeadResultLenFlag)) {
@@ -2371,6 +2624,18 @@ public class ReadStringXmlController {
                         reportCardId.setText(reportCard.getCode());
                         errorMessage.setText("尿铅结果式不正确!");
                         flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("铅".equals(hazard)){
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("尿铅结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
                 //ULeadUnitName尿铅计量单位名称
@@ -2413,7 +2678,7 @@ public class ReadStringXmlController {
                     }
                 }
                 //ZPPResult铅红细胞锌原卟啉（ZPP）结果
-                if (hazardCodeInflag && ("铅".equals(reportCard.getZPPResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getZPPResult())){
                     boolean formatZPPResultFlag = CommonUtils.isCNChar(reportCard.getZPPResult());
                     boolean formatZPPResultLenFlag = CommonUtils.isMaxLength(reportCard.getZPPResult(), 8);
                     if (!(formatZPPResultFlag && formatZPPResultLenFlag)) {
@@ -2423,6 +2688,18 @@ public class ReadStringXmlController {
                         reportCardId.setText(reportCard.getCode());
                         errorMessage.setText("铅红细胞锌原卟啉（ZPP）结果格式不正确!");
                         flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("铅".equals(hazard)){
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("铅红细胞锌原卟啉（ZPP）结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
                 //ZPPUnitName铅红细胞锌原卟啉（ZPP）计量单位名称
@@ -2465,7 +2742,7 @@ public class ReadStringXmlController {
                     }
                 }
                 //neutResult苯血常规（中性粒细胞绝对值<Neut#>）结果
-                if (hazardCodeInflag && ("苯".equals(reportCard.getNeutResult()))) {
+                if(!StringUtils.isEmpty(reportCard.getNeutResult())){
                     boolean formatgetNeutResultFlag = CommonUtils.isCNChar(reportCard.getNeutResult());
                     boolean formatgetNeutResultLenFlag = CommonUtils.isMaxLength(reportCard.getNeutResult(), 8);
                     if (!(formatgetNeutResultFlag && formatgetNeutResultLenFlag)) {
@@ -2475,6 +2752,18 @@ public class ReadStringXmlController {
                         reportCardId.setText(reportCard.getCode());
                         errorMessage.setText("苯血常规（中性粒细胞绝对值<Neut#>）结果格式不正确!");
                         flag = false;
+                    }
+                } else{
+                    for(String hazard:hazardList){
+                        if("苯".equals(hazard)){
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("苯血常规（中性粒细胞绝对值<Neut#>）结果不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
                 //neutUnitName苯血常规（中性粒细胞绝对值<Neut#>）计量单位名称
@@ -2518,7 +2807,7 @@ public class ReadStringXmlController {
                     }
                 }
                 //hearingResult噪声双耳高频平均听阈（校正值）结果
-                if (hazardCodeInflag && ("噪声".equals(reportCard.getHearingReuslt()))) {
+                if(!StringUtils.isEmpty(reportCard.getHearingReuslt())){
                     boolean formatHearingResultFlag = CommonUtils.isCNChar(reportCard.getHearingReuslt());
                     boolean formatHearingResultLenFlag = CommonUtils.isMaxLength(reportCard.getNeutResult(), 8);
                     if (!(formatHearingResultFlag && formatHearingResultLenFlag)) {
@@ -2526,10 +2815,23 @@ public class ReadStringXmlController {
                         Element errorMessage = errorData.addElement("errorMessage");
                         Element reportCardId = errorData.addElement("reportCard");
                         reportCardId.setText(reportCard.getCode());
-                        errorMessage.setText("苯血常规（中性粒细胞绝对值<Neut#>）结果格式不正确!");
+                        errorMessage.setText("噪声双耳高频平均听阈（校正值）结果格式不正确!");
                         flag = false;
                     }
+                } else{
+                    for(String hazard:hazardList){
+                        if("噪声".equals(hazard)){
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("噪声双耳高频平均听阈（校正值）结果不能为空!");
+                            flag = false;
+                            break;
+                        }
+                    }
                 }
+
                 //hearingUnitName噪声双耳高频平均听阈（校正值）计量单位名称
                 if (!StringUtils.isEmpty(reportCard.getHearingUnitName())) {
                     boolean formatHearingUnitNameFlag = CommonUtils.isCNChar(reportCard.getHearingUnitName());
@@ -2572,7 +2874,7 @@ public class ReadStringXmlController {
                 }
 
                 //RPBTCode布鲁菌属虎红缓冲液玻片凝3集实验（RPBT）编码
-                if (hazardCodeInflag && ("布鲁氏菌".equals(reportCard.getRPBTCode()))) {
+                if(!StringUtils.isEmpty(reportCard.getRPBTCode())){
                     boolean formatRPBTCodeFlag = CommonUtils.isDigist(reportCard.getRPBTCode());
                     boolean formatRPBTCodeLenFlag = CommonUtils.isLength(reportCard.getRPBTCode(), 1);
                     if (!(formatRPBTCodeFlag && formatRPBTCodeLenFlag)) {
@@ -2583,10 +2885,21 @@ public class ReadStringXmlController {
                         errorMessage.setText("布鲁菌属虎红缓冲液玻片凝3集实验（RPBT）编码格式不正确!");
                         flag = false;
                     }
+                } else{
+                    for(String hazard:hazardList){
+                        if("布鲁氏菌".equals(hazard)){
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("布鲁菌属虎红缓冲液玻片凝3集实验（RPBT）编码不能为空!");
+                            flag = false;
+                            break;
+                        }
+                    }
                 }
-
                 //wrightCode布鲁菌属试管凝集反应（Wright）(1:100) 编码
-                if (hazardCodeInflag && ("布鲁氏菌".equals(reportCard.getWrightCode()))) {
+                if(!StringUtils.isEmpty(reportCard.getWrightCode())){
                     boolean formatWrightCodeFlag = CommonUtils.idOneNot(reportCard.getWrightCode());
                     if (!(formatWrightCodeFlag)) {
                         Element errorData = errorReportCards.addElement("errorData");
@@ -2596,18 +2909,17 @@ public class ReadStringXmlController {
                         errorMessage.setText("布鲁菌属试管凝集反应（Wright）(1:100)编码格式不正确!");
                         flag = false;
                     }
-                }
-                //conclusionsCode体检结论编码
-                if (hazardCodeInflag && ("布鲁氏菌".equals(reportCard.getConclusionsCode()))) {
-                    boolean formatConclusionsCodeFlag = CommonUtils.isDigist(reportCard.getConclusionsCode());
-                    boolean formatConclusionsCodeLenFlag = CommonUtils.isLength(reportCard.getConclusionsCode(), 1);
-                    if (!(formatConclusionsCodeFlag && formatConclusionsCodeLenFlag)) {
-                        Element errorData = errorReportCards.addElement("errorData");
-                        Element errorMessage = errorData.addElement("errorMessage");
-                        Element reportCardId = errorData.addElement("reportCard");
-                        reportCardId.setText(reportCard.getCode());
-                        errorMessage.setText("体检结论编码格式不正确!");
-                        flag = false;
+                } else{
+                    for(String hazard:hazardList){
+                        if("布鲁氏菌".equals(hazard)){
+                            Element errorData = errorReportCards.addElement("errorData");
+                            Element errorMessage = errorData.addElement("errorMessage");
+                            Element reportCardId = errorData.addElement("reportCard");
+                            reportCardId.setText(reportCard.getCode());
+                            errorMessage.setText("布鲁菌属试管凝集反应（Wright）(1:100) 编码不能为空!");
+                            flag = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -2630,14 +2942,6 @@ public class ReadStringXmlController {
             //用人单位数据格式校验
             //creditCode统一社会信用代码
             if (!StringUtils.isEmpty(reportCard.getCreditCode())) {
-               /* ZybYrdw zybYrdw = zybYrdwServiceImpl.selectByCreditCode(reportCard.getCreditCode());
-                if (zybYrdw != null) {
-                    Element errorData = errorEmployingUnits.addElement("errorData");
-                    Element errorMessage = errorData.addElement("errorMessage");
-                    Element employingUnit = errorData.addElement("employingUnit");
-                    employingUnit.setText(reportCard.getEmployerCode());
-                    errorMessage.setText("统一社会信用代码已经存在!");
-                }*/
                 boolean formatCreditCodeFlag = CommonUtils.isCNChar(reportCard.getCreditCode());
                 boolean formatCreditCodeLenFlag = CommonUtils.isMaxLength(reportCard.getCreditCode(), 18);
                 if (!(formatCreditCodeFlag && formatCreditCodeLenFlag)) {

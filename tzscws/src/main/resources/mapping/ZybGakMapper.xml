@@ -47,6 +47,10 @@
     <result column="PLT_UNIT_NAME" jdbcType="VARCHAR" property="pltUnitName" />
     <result column="PLT_MINI_RANGE" jdbcType="VARCHAR" property="pltMiniRange" />
     <result column="PLT_MAX_RANGE" jdbcType="VARCHAR" property="pltMaxRange" />
+    <result column="BGLU_RESULT" jdbcType="VARCHAR" property="bgluResult" />
+    <result column="BGLU_UNIT_NAME" jdbcType="VARCHAR" property="bgluUnitName" />
+    <result column="BGLU_MINI_RANGE" jdbcType="VARCHAR" property="bgluMiniRange" />
+    <result column="BGLU_MAX_RANGE" jdbcType="VARCHAR" property="bgluMaxRange" />
     <result column="GLU_RESULT" jdbcType="VARCHAR" property="gluResult" />
     <result column="GLU_UNIT_NAME" jdbcType="VARCHAR" property="gluUnitName" />
     <result column="GLU_MINI_RANGE" jdbcType="VARCHAR" property="gluMiniRange" />
@@ -205,7 +209,8 @@
     #{rbcMiniRange,jdbcType=VARCHAR}, #{rbcMaxRange,jdbcType=VARCHAR}, #{hbResult,jdbcType=VARCHAR},
     #{hbUnitName,jdbcType=VARCHAR}, #{hbMiniRange,jdbcType=VARCHAR}, #{hbMaxRange,jdbcType=VARCHAR},
     #{pltResult,jdbcType=VARCHAR}, #{pltUnitName,jdbcType=VARCHAR}, #{pltMiniRange,jdbcType=VARCHAR},
-    #{pltMaxRange,jdbcType=VARCHAR}, #{gluResult,jdbcType=VARCHAR}, #{gluUnitName,jdbcType=VARCHAR},
+    #{pltMaxRange,jdbcType=VARCHAR}, #{bgluResult,jdbcType=VARCHAR}, #{bgluUnitName,jdbcType=VARCHAR},
+    #{bgluMiniRange,jdbcType=VARCHAR}, #{bgluMaxRange,jdbcType=VARCHAR},#{gluResult,jdbcType=VARCHAR}, #{gluUnitName,jdbcType=VARCHAR},
     #{gluMiniRange,jdbcType=VARCHAR}, #{gluMaxRange,jdbcType=VARCHAR}, #{proResult,jdbcType=VARCHAR},
     #{proUnitName,jdbcType=VARCHAR}, #{proMiniRange,jdbcType=VARCHAR}, #{proMaxRange,jdbcType=VARCHAR},
     #{uwbcResult,jdbcType=VARCHAR}, #{uwbcUnitName,jdbcType=VARCHAR}, #{uwbcMiniRange,jdbcType=VARCHAR},
@@ -357,6 +362,18 @@
       </if>
       <if test="pltMaxRange != null">
         PLT_MAX_RANGE,
+      </if>
+      <if test="bgluResult != null">
+        BGLU_RESULT,
+      </if>
+      <if test="bgluUnitName != null">
+        BGLU_UNIT_NAME,
+      </if>
+      <if test="bgluMiniRange != null">
+        BGLU_MINI_RANGE,
+      </if>
+      <if test="bgluMaxRange != null">
+        BGLU_MAX_RANGE,
       </if>
       <if test="gluResult != null">
         GLU_RESULT,
@@ -671,6 +688,18 @@
       </if>
       <if test="pltMaxRange != null">
         #{pltMaxRange,jdbcType=VARCHAR},
+      </if>
+      <if test="bgluResult != null">
+        #{bgluResult,jdbcType=VARCHAR},
+      </if>
+      <if test="bgluUnitName != null">
+        #{bgluUnitName,jdbcType=VARCHAR},
+      </if>
+      <if test="bgluMiniRange != null">
+        #{bgluMiniRange,jdbcType=VARCHAR},
+      </if>
+      <if test="bgluMaxRange != null">
+        #{bgluMaxRange,jdbcType=VARCHAR},
       </if>
       <if test="gluResult != null">
         #{gluResult,jdbcType=VARCHAR},
@@ -990,6 +1019,18 @@
       <if test="pltMaxRange != null">
         PLT_MAX_RANGE = #{pltMaxRange,jdbcType=VARCHAR},
       </if>
+      <if test="bgluResult != null">
+        BGLU_RESULT = #{bgluResult,jdbcType=VARCHAR},
+      </if>
+      <if test="bgluUnitName != null">
+        BGLU_UNIT_NAME = #{bgluUnitName,jdbcType=VARCHAR},
+      </if>
+      <if test="gluMiniRange != null">
+        BGLU_MINI_RANGE = #{bgluMiniRange,jdbcType=VARCHAR},
+      </if>
+      <if test="bgluMaxRange != null">
+        BGLU_MAX_RANGE = #{bgluMaxRange,jdbcType=VARCHAR},
+      </if>
       <if test="gluResult != null">
         GLU_RESULT = #{gluResult,jdbcType=VARCHAR},
       </if>
@@ -1228,6 +1269,10 @@
     PLT_UNIT_NAME = #{pltUnitName,jdbcType=VARCHAR},
     PLT_MINI_RANGE = #{pltMiniRange,jdbcType=VARCHAR},
     PLT_MAX_RANGE = #{pltMaxRange,jdbcType=VARCHAR},
+    BGLU_RESULT = #{bgluResult,jdbcType=VARCHAR},
+    BGLU_UNIT_NAME = #{bgluUnitName,jdbcType=VARCHAR},
+    BGLU_MINI_RANGE = #{bgluMiniRange,jdbcType=VARCHAR},
+    BGLU_MAX_RANGE = #{bgluMaxRange,jdbcType=VARCHAR},
     GLU_RESULT = #{gluResult,jdbcType=VARCHAR},
     GLU_UNIT_NAME = #{gluUnitName,jdbcType=VARCHAR},
     GLU_MINI_RANGE = #{gluMiniRange,jdbcType=VARCHAR},
@@ -1357,7 +1402,9 @@
     RBC_MINI_RANGE, RBC_MAX_RANGE, HB_RESULT,
     HB_UNIT_NAME, HB_MINI_RANGE, HB_MAX_RANGE,
     PLT_RESULT, PLT_UNIT_NAME, PLT_MINI_RANGE,
-    PLT_MAX_RANGE, GLU_RESULT, GLU_UNIT_NAME,
+    PLT_MAX_RANGE, BGLU_RESULT, BGLU_UNIT_NAME,
+    BGLU_MINI_RANGE, BGLU_MAX_RANGE,
+    GLU_RESULT, GLU_UNIT_NAME,
     GLU_MINI_RANGE, GLU_MAX_RANGE, PRO_RESULT,
     PRO_UNIT_NAME, PRO_MINI_RANGE, PRO_MAX_RANGE,
     UWBC_RESULT, UWBC_UNIT_NAME, UWBC_MINI_RANGE,
@@ -1394,7 +1441,8 @@
     #{item.rbcMiniRange,jdbcType=VARCHAR}, #{item.rbcMaxRange,jdbcType=VARCHAR}, #{item.hbResult,jdbcType=VARCHAR},
     #{item.hbUnitName,jdbcType=VARCHAR}, #{item.hbMiniRange,jdbcType=VARCHAR}, #{item.hbMaxRange,jdbcType=VARCHAR},
     #{item.pltResult,jdbcType=VARCHAR}, #{item.pltUnitName,jdbcType=VARCHAR}, #{item.pltMiniRange,jdbcType=VARCHAR},
-    #{item.pltMaxRange,jdbcType=VARCHAR}, #{item.gluResult,jdbcType=VARCHAR}, #{item.gluUnitName,jdbcType=VARCHAR},
+    #{item.pltMaxRange,jdbcType=VARCHAR}, #{item.bgluResult,jdbcType=VARCHAR}, #{item.bgluUnitName,jdbcType=VARCHAR},
+    #{item.bgluMiniRange,jdbcType=VARCHAR}, #{item.bgluMaxRange,jdbcType=VARCHAR},#{item.gluResult,jdbcType=VARCHAR}, #{item.gluUnitName,jdbcType=VARCHAR},
     #{item.gluMiniRange,jdbcType=VARCHAR}, #{item.gluMaxRange,jdbcType=VARCHAR}, #{item.proResult,jdbcType=VARCHAR},
     #{item.proUnitName,jdbcType=VARCHAR}, #{item.proMiniRange,jdbcType=VARCHAR}, #{item.proMaxRange,jdbcType=VARCHAR},
     #{item.uwbcResult,jdbcType=VARCHAR}, #{item.uwbcUnitName,jdbcType=VARCHAR}, #{item.uwbcMiniRange,jdbcType=VARCHAR},
