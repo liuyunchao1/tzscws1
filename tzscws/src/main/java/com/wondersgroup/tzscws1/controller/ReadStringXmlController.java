@@ -45,88 +45,6 @@ public class ReadStringXmlController {
 
     public static final String SUCCED = "suceed";
     boolean  hazardCodeInflag = false;
-       /*String xml = "<data>" +
-                "<header>" +
-                "<eventId>业务请求类型编码</eventId>" +
-                "<hosId>医院编码</hosId>" +
-                "<requestTime>请求时间</requestTime>" +
-                "<headSign>用户秘钥</headSign>" +
-                "<bodySign>数据签名</bodySign>" +
-                "</header>" +
-                "<body>" +
-                "<reportCards>" +
-                "<reportCard>" +
-                "<code>88</code>" +
-                "<hosId>331003001</hosId>" +
-                "<orgCode>1</orgCode>"+
-                "<name>gfdgfg</name>" +
-                "<idcard>43243253</idcard>" +
-                "<bodyCheckType>1</bodyCheckType>" +
-                "<sexCode>2</sexCode>" +
-                "<birthday>1991-01-12</birthday>" +
-                "<hazardCode>5,6</hazardCode>" +
-                "<hazardYear>11</hazardYear>" +
-                "<hazardMonth>12</hazardMonth>" +
-                "<sysPressResult>22.2</sysPressResult>" +
-                "<diasPressResult>6.66</diasPressResult>" +
-                "<seniorityYear>8</seniorityYear>" +
-                "<seniorityMonth>8</seniorityMonth>" +
-                "<ECGCode>0230</ECGCode>" +
-                "<conclusionsCode>1</conclusionsCode>" +
-                "</reportCard>" +
-                "<reportCard>" +
-                "<code>788</code>" +
-                "<hosId>22434</hosId>" +
-                "<orgCode>1</orgCode>"+
-                "<name>liuyunchao</name>" +
-                "<idcard>43243253</idcard>" +
-                "<bodyCheckType>1</bodyCheckType>" +
-                "<sexCode>2</sexCode>" +
-                "<birthday>1991-01-12</birthday>" +
-                "<hazardCode>5,6</hazardCode>" +
-                "<hazardYear>19</hazardYear>" +
-                "<hazardMonth>12</hazardMonth>" +
-                "<sysPressResult>3.33</sysPressResult>" +
-                "<diasPressResult>4.44</diasPressResult>" +
-                "<seniorityYear>9</seniorityYear>" +
-                "<seniorityMonth>9</seniorityMonth>" +
-                "<ECGCode>0250</ECGCode>" +
-                "<conclusionsCode>2</conclusionsCode>" +
-                "</reportCard>" +
-                "</reportCards>" +
-                "<employingUnits>"+
-                "<employingUnit>" +
-                "<employerCode>3</employerCode>"+
-                "<employerName>刘云超</employerName>"+
-                "<employerDesc>台州医院好</employerDesc>"+
-                "<areaStandard>21243435</areaStandard>"+
-                "<areaAddress>长啥</areaAddress>"+
-                "<economicCode>160a</economicCode>"+
-                "<industryCateCode>24</industryCateCode>"+
-                "<enterpriseCode>004</enterpriseCode>"+
-                "<postAddress>长沙市岳麓区</postAddress>"+
-                "<zipCode>425000</zipCode>"+
-                "<contactPerson>刘云超</contactPerson>"+
-                "<contactPhone>1244566</contactPhone>"+
-                "</employingUnit>" +
-                 "<employingUnit>" +
-                 "<employerCode>2</employerCode>"+
-                 "<employerName>刘超</employerName>"+
-                 "<employerDesc>台州医院好</employerDesc>"+
-                 "<areaStandard>21243435</areaStandard>"+
-                 "<areaAddress>长啥</areaAddress>"+
-                 "<economicCode>160a</economicCode>"+
-                 "<industryCateCode>24</industryCateCode>"+
-                 "<enterpriseCode>005</enterpriseCode>"+
-                 "<postAddress>长沙市岳麓区</postAddress>"+
-                 "<zipCode>425000</zipCode>"+
-                 "<contactPerson>刘云超</contactPerson>"+
-                 "<contactPhone>1244566</contactPhone>"+
-                 "</employingUnit>" +
-                "</employingUnits>"+
-                "</body>" +
-                "</data>";*/
-        //解析xml头部
 
     /**
      * 解析header 头部返回HeaderDataEntty对像
@@ -200,6 +118,11 @@ public class ReadStringXmlController {
         Element message = dataInfo.addElement("message");
         List<BodyDataEntity> dateStr = new ArrayList<BodyDataEntity>();
         List<BodyDataEntity> empDateStr = new ArrayList<BodyDataEntity>();
+        List<BodyDataEntity> dateStrUpdate = new ArrayList<BodyDataEntity>();
+        List<BodyDataEntity> empDateStrUpdate = new ArrayList<BodyDataEntity>();
+        //用于后续判断数据是否全部成功入库
+        List<Boolean>  empDataStrFlag = new ArrayList<Boolean>();
+        List<Boolean>  dateStrFlag = new ArrayList<Boolean>();
         if(StringUtils.isEmpty(xml)){
             returnCode.setText("105");
             message.setText("请求参数为空!");
@@ -365,7 +288,6 @@ public class ReadStringXmlController {
                 BodyDataEntity zybYrdwDateStr = new BodyDataEntity();
                 Element recordEless = (Element) iterss.next();
                 //数据入库实体
-                ZybGak zybGak = new ZybGak();
                 codeResult = recordEless.elementTextTrim("code");
                 bodyDataEntity.setCode(codeResult);
                 hosIdResult = recordEless.elementTextTrim("hosId");
@@ -671,271 +593,271 @@ public class ReadStringXmlController {
                     logger.info("个案卡请求参数employerName为空值:" + retDoc.asXML());
                     return retDoc.asXML();
                 }
-                //sexCode性别代码表
-                List<CodeInfo>  sexCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(124));
-                boolean sexCodeflag=false;
-                for(CodeInfo codeInfo : sexCodeList){
-                    if(sexCodeResult.equals(codeInfo.getCode())){
-                        sexCodeflag=true;
-                        break;
-                    }
-                }
-                if(!sexCodeflag){
-                    returnCode.setText("102");
-                    message.setText("无法找到性别编码!");
-                    logger.info("无法找到性别编码!");
-                    logger.info("无法找到性别编码:" + retDoc.asXML());
-                    return retDoc.asXML();
-                }
-                //判断接触监测的主要职业病危害因素编码hazardCode格式
-                List<CodeInfo>  hazardCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(900));
-                //判断数组的长度等于hazardCodeList的长度时所有值都在表里面
-                ArrayList<Integer> hazardCodeInflagList = new ArrayList<Integer>();
-                if(hazardCodeResult.indexOf(",")==-1){
-                    for(CodeInfo codeInfo : hazardCodeList){
-                        if(hazardCodeResult.equals(codeInfo.getCode())){
-                            hazardCodeInflag=true;
-                            break;
+                ZybGak zybGakBykey = zybGakServiceImpl.selectByPrimaryKey(codeResult+hosIdResult);
+                if(zybGakBykey!=null){
+                    logger.info("更新个案卡数据");
+                    dateStrUpdate.add(bodyDataEntity);
+                    boolean dateStrUpdteFg= isDateFormate(dateStrUpdate,dataInfo);
+                    dateStrFlag.add(dateStrUpdteFg);
+                    if(dateStrUpdteFg){
+                        ZybGak zybGak = new ZybGak();
+                        //id 为唯一标识codeResult+hosIdResult
+                        zybGak.setId(codeResult+hosIdResult);
+                        zybGak.setCode(codeResult);
+                        zybGak.setHosId(hosIdResult);
+                        zybGak.setBirthday(sdf.parse(birthdayResult));
+                        zybGak.setOrgCode(orgCodeResult);
+                        zybGak.setEmployerName(employerNameResult);
+                        zybGak.setName(nameResult);
+                        zybGak.setIdcard(idcardResult);
+                        zybGak.setBodyCheckType(Short.parseShort(bodyCheckTypeResult));
+                        zybGak.setBodyCheckTime(sdf.parse(bodyCheckTimeResult));
+                        zybGak.setSexCode(Short.parseShort(sexCodeResult));
+                        zybGak.setHazardCode(hazardCodeResult);
+                        zybGak.setHazardYear(Short.parseShort(hazardYearResult));
+                        zybGak.setHazardMonth(Short.parseShort(hazardMonthResult));
+                        zybGak.setSysPressResult(new BigDecimal(sysPressResult));
+                        zybGak.setDiasPressResult(new BigDecimal(diasPressResult));
+                        zybGak.setEcgCode(ECGCodeResult);
+                        zybGak.setConclusionsCode(Short.parseShort(conclusionsCodeResult));
+                        zybGak.setTelPhone(telPhoneResult);
+                        if(!StringUtils.isEmpty(seniorityYearResult)){
+                            zybGak.setSeniorityYear(Short.parseShort(seniorityYearResult));
                         }
+                        if(!StringUtils.isEmpty(seniorityMonthResult)){
+                            zybGak.setSeniorityMonth(Short.parseShort(seniorityMonthResult));
+                        }
+                        if(!StringUtils.isEmpty(exposureYearResult)){
+                            zybGak.setSeniorityMonth(Short.parseShort(exposureYearResult));
+                        }
+                        if(!StringUtils.isEmpty(exposureMonthResult)){
+                            zybGak.setExposureMonth(Short.parseShort(exposureMonthResult));
+                        }
+                        zybGak.setWorkShop(workShopResult);
+                        zybGak.setJobCode(jobCodeResult);
+                        zybGak.setSysPressUnitName(sysPressUnitNameResult);
+                        zybGak.setDiasPressUnitName(diasPressUnitNameResult);
+                        zybGak.setWbcResult(WBCResult);
+                        zybGak.setWbcUnitName(WBCUnitNameResult);
+                        zybGak.setWbcMiniRange(WBCMiniRangeResult);
+                        zybGak.setWbcMaxRange(WBCMaxRangeResult);
+                        zybGak.setRbcResult(RBCResult);
+                        zybGak.setRbcMiniRange(RBCMiniRangeResult);
+                        zybGak.setRbcMaxRange(RBCMaxRangeResult);
+                        zybGak.setRbcUnitName(RBCUnitNameResult);
+                        zybGak.setHbResult(HbResult);
+                        zybGak.setHbUnitName(HbUnitNameResult);
+                        zybGak.setHbMaxRange(HbMaxRangeResult);
+                        zybGak.setHbMiniRange(HbMiniRangeResult);
+                        zybGak.setPltResult(PLTResult);
+                        zybGak.setPltUnitName(PLTUnitNameResult);
+                        zybGak.setPltMaxRange(PLTMaxRangeResult);
+                        zybGak.setPltMiniRange(PLTMiniRangeResult);
+                        zybGak.setBgluResult(BGLUResult);
+                        zybGak.setBgluUnitName(BGLUUnitName);
+                        zybGak.setBgluMaxRange(BGLUMaxRange);
+                        zybGak.setBgluMiniRange(BGLUMiniRange);
+                        zybGak.setGluResult(GLUResult);
+                        zybGak.setGluUnitName(GLUUnitNameResult);
+                        zybGak.setGluMiniRange(GLUMiniRangeResult);
+                        zybGak.setGluMaxRange(GLUMaxRangeResult);
+                        zybGak.setProResult(PROResult);
+                        zybGak.setProUnitName(PROUnitNameResult);
+                        zybGak.setProMiniRange(PROMiniRangeResult);
+                        zybGak.setProMaxRange(PROMaxRangeResult);
+                        zybGak.setUwbcResult(UWBCResult);
+                        zybGak.setUwbcUnitName(UWBCUnitNameResult);
+                        zybGak.setUwbcMiniRange(UWBCMiniRangeResult);
+                        zybGak.setUwbcMaxRange(UWBCMaxRangeResult);
+                        zybGak.setBldResult(BLDResult);
+                        zybGak.setBldUnitName(BLDUnitNameResult);
+                        zybGak.setBldMiniRange(BLDMiniRangeResult);
+                        zybGak.setBldMaxRange(BLDMaxRangeResult);
+                        zybGak.setAltResult(ALTResult);
+                        zybGak.setAltUnitName(ALTUnitNameResult);
+                        zybGak.setAltMiniRange(ALTMiniRangeResult);
+                        zybGak.setAltMaxRange(ALTMaxRangeResult);
+                        zybGak.setChestCode(CHESTCodeResult);
+                        zybGak.setFvcResult(FVCResult);
+                        zybGak.setFvcUnitName(FVCUnitNameResult);
+                        zybGak.setFvcMiniRange(FVCMiniRangeResult);
+                        zybGak.setFvcMaxRange(FVCMaxRangeResult);
+                        zybGak.setFev1Result(FEV1Result);
+                        zybGak.setFev1UnitName(FEV1UnitNameResult);
+                        zybGak.setFev1MiniRange(FEV1MiniRangeResult);
+                        zybGak.setFev1MaxRange(FEV1MaxRangeResult);
+                        zybGak.setFev1fvcResult(FEV1FVCResult);
+                        zybGak.setFev1fvcUnitName(FEV1FVCUnitNameResult);
+                        zybGak.setFev1fvcMiniRange(FEV1FVCMiniRangeResult);
+                        zybGak.setFev1fvcMaxRange(FEV1FVCMaxRangeResult);
+                        zybGak.setbLeadResult(BLeadResult);
+                        zybGak.setbLeadUnitName(BLeadUnitNameResult);
+                        zybGak.setbLeadMiniRange(BLeadMiniRangeResult);
+                        zybGak.setbLeadMaxRange(BLeadMaxRangeResult);
+                        zybGak.setuLeadResult(ULeadResult);
+                        zybGak.setuLeadUnitName(ULeadUnitNameResult);
+                        zybGak.setuLeadMiniRange(ULeadMiniRangeResult);
+                        zybGak.setuLeadMaxRange(ULeadMaxRangeResult);
+                        zybGak.setZppResult(ZPPResult);
+                        zybGak.setZppUnitName(ZPPUnitNameResult);
+                        zybGak.setZppMiniRange(ZPPMiniRangeResult);
+                        zybGak.setZppMaxRange(ZPPMaxRangeResult);
+                        zybGak.setNeutResult(NeutResult);
+                        zybGak.setNeutUnitName(NeutUnitNameResult);
+                        zybGak.setNeutMiniRange(NeutMiniRangeResult);
+                        zybGak.setNeutUnitName(NeutMaxRangeResult);
+                        zybGak.setHearingReuslt(hearingReuslt);
+                        zybGak.setHearingUnitName(hearingUnitNameResult);
+                        zybGak.setHearingMiniRange(hearingMiniRangeResult);
+                        zybGak.setHearingMaxRange(hearingMaxRangeResult);
+                        if(!StringUtils.isEmpty(RPBTCodeResult)){
+                            zybGak.setRpbtCode(Short.parseShort(RPBTCodeResult));
+                        }
+                        //1	已审核2	未审核3	全部m4	已删除
+                        zybGak.setShbz("2");
+                        zybGak.setGluResult(wrightCodeResult);
+                        zybGak.setGluResult(conclusionsCodeResult);
+                        //获取当前系统时间
+                        Date currentTime = new Date();
+                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String dateString = formatter.format(currentTime);
+                        Date currentDate = formatter.parse(dateString);
+                        zybGak.setLogsj(currentDate);
+                        zybGakServiceImpl.updateByPrimaryKey(zybGak);
                     }
-                    if(!hazardCodeInflag){
-                        returnCode.setText("102");
-                        message.setText("无法找到接触监测的主要职业病危害因素编码!");
-                        logger.info("无法找到接触监测的主要职业病危害因素编码:" + retDoc.asXML());
-                        return retDoc.asXML();
-                    }
+                    dateStrUpdate.clear();
                 }else{
-                    String[] hazardCodeSize = hazardCodeResult.split(",");
-                    for(int i=0;i<hazardCodeSize.length;i++){
-                        for(CodeInfo codeInfo : hazardCodeList){
-                            if(hazardCodeSize[i].equals(codeInfo.getCode())){
-                                hazardCodeInflagList.add(1);
-                                break;
-                            }
+                    dateStr.add(bodyDataEntity);
+                    boolean dateStrFg = isDateFormate(dateStr,dataInfo);
+                    dateStrFlag.add(dateStrFg);
+                    if(dateStrFg){
+                        ZybGak zybGak = new ZybGak();
+                        //id 为唯一标识codeResult+hosIdResult
+                        zybGak.setId(codeResult+hosIdResult);
+                        zybGak.setCode(codeResult);
+                        zybGak.setHosId(hosIdResult);
+                        zybGak.setBirthday(sdf.parse(birthdayResult));
+                        zybGak.setOrgCode(orgCodeResult);
+                        zybGak.setEmployerName(employerNameResult);
+                        zybGak.setName(nameResult);
+                        zybGak.setIdcard(idcardResult);
+                        zybGak.setBodyCheckType(Short.parseShort(bodyCheckTypeResult));
+                        zybGak.setBodyCheckTime(sdf.parse(bodyCheckTimeResult));
+                        zybGak.setSexCode(Short.parseShort(sexCodeResult));
+                        zybGak.setHazardCode(hazardCodeResult);
+                        zybGak.setHazardYear(Short.parseShort(hazardYearResult));
+                        zybGak.setHazardMonth(Short.parseShort(hazardMonthResult));
+                        zybGak.setSysPressResult(new BigDecimal(sysPressResult));
+                        zybGak.setDiasPressResult(new BigDecimal(diasPressResult));
+                        zybGak.setEcgCode(ECGCodeResult);
+                        zybGak.setConclusionsCode(Short.parseShort(conclusionsCodeResult));
+                        zybGak.setTelPhone(telPhoneResult);
+                        if(!StringUtils.isEmpty(seniorityYearResult)){
+                            zybGak.setSeniorityYear(Short.parseShort(seniorityYearResult));
                         }
-                    }
-                    if(!(hazardCodeSize.length==hazardCodeInflagList.size())){
-                        returnCode.setText("102");
-                        message.setText("无法找到接触监测的主要职业病危害因素编码!");
-                        logger.info("无法找到接触监测的主要职业病危害因素编码:" + retDoc.asXML());
-                        return retDoc.asXML();
-                    }
-                }
-                //判断心电图编码ECGCode是否在字典里
-                List<CodeInfo>  ECGCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(902));
-                //判断数组的长度等于ECGCodeInflagList的长度时所有值都在表里面
-                ArrayList<Integer> ECGCodeInflagList = new ArrayList<Integer>();
-                boolean   ECGCodeInflag = false;
-                if(ECGCodeResult.indexOf(",")==-1){
-                    for(CodeInfo codeInfo : ECGCodeList){
-                        if(ECGCodeResult.equals(codeInfo.getCode())){
-                            ECGCodeInflag=true;
-                            break;
+                        if(!StringUtils.isEmpty(seniorityMonthResult)){
+                            zybGak.setSeniorityMonth(Short.parseShort(seniorityMonthResult));
                         }
-                    }
-                    if(!ECGCodeInflag){
-                        returnCode.setText("102");
-                        message.setText("无法找到心电图编码!");
-                        logger.info("无法找到心电图编码:" + retDoc.asXML());
-                        return retDoc.asXML();
-                    }
-                }else{
-                    String[] ECGCodeSize = ECGCodeResult.split(",");
-                    for(int i=0;i<ECGCodeSize.length;i++){
-                        for(CodeInfo codeInfo : hazardCodeList){
-                            if(ECGCodeSize[i].equals(codeInfo.getCode())){
-                                ECGCodeInflagList.add(1);
-                                break;
-                            }
+                        if(!StringUtils.isEmpty(exposureYearResult)){
+                            zybGak.setSeniorityMonth(Short.parseShort(exposureYearResult));
                         }
-                    }
-                    if(!(ECGCodeSize.length==ECGCodeInflagList.size())){
-                        returnCode.setText("102");
-                        message.setText("无法找到心电图编码!");
-                        logger.info("无法找到心电图编码:" + retDoc.asXML());
-                        return retDoc.asXML();
-                    }
-                }
-
-                //判断胸片编码CHESTCode是否在字典里
-                if(!"".equals(CHESTCodeResult) && CHESTCodeResult!=null){
-                    List<CodeInfo>  CHESTCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(903));
-                    //判断数组的长度等于ECGCodeInflagList的长度时所有值都在表里面
-                    ArrayList<Integer> CHESTCodeInflagList = new ArrayList<Integer>();
-                    boolean   CHESTCodeInflag = false;
-                    logger.info("CHESTCodeResult:" + CHESTCodeResult);
-                    if(CHESTCodeResult.indexOf(",")==-1){
-                        for(CodeInfo codeInfo : CHESTCodeList){
-                            if(CHESTCodeResult.equals(codeInfo.getCode())){
-                                CHESTCodeInflag=true;
-                                break;
-                            }
+                        if(!StringUtils.isEmpty(exposureMonthResult)){
+                            zybGak.setExposureMonth(Short.parseShort(exposureMonthResult));
                         }
-                        if(!CHESTCodeInflag){
-                            returnCode.setText("102");
-                            message.setText("无法找到胸片编码!");
-                            logger.info("无法找到胸片编码:" + retDoc.asXML());
-                            return retDoc.asXML();
+                        zybGak.setWorkShop(workShopResult);
+                        zybGak.setJobCode(jobCodeResult);
+                        zybGak.setSysPressUnitName(sysPressUnitNameResult);
+                        zybGak.setDiasPressUnitName(diasPressUnitNameResult);
+                        zybGak.setWbcResult(WBCResult);
+                        zybGak.setWbcUnitName(WBCUnitNameResult);
+                        zybGak.setWbcMiniRange(WBCMiniRangeResult);
+                        zybGak.setWbcMaxRange(WBCMaxRangeResult);
+                        zybGak.setRbcResult(RBCResult);
+                        zybGak.setRbcMiniRange(RBCMiniRangeResult);
+                        zybGak.setRbcMaxRange(RBCMaxRangeResult);
+                        zybGak.setRbcUnitName(RBCUnitNameResult);
+                        zybGak.setHbResult(HbResult);
+                        zybGak.setHbUnitName(HbUnitNameResult);
+                        zybGak.setHbMaxRange(HbMaxRangeResult);
+                        zybGak.setHbMiniRange(HbMiniRangeResult);
+                        zybGak.setPltResult(PLTResult);
+                        zybGak.setPltUnitName(PLTUnitNameResult);
+                        zybGak.setPltMaxRange(PLTMaxRangeResult);
+                        zybGak.setPltMiniRange(PLTMiniRangeResult);
+                        zybGak.setBgluResult(BGLUResult);
+                        zybGak.setBgluUnitName(BGLUUnitName);
+                        zybGak.setBgluMaxRange(BGLUMaxRange);
+                        zybGak.setBgluMiniRange(BGLUMiniRange);
+                        zybGak.setGluResult(GLUResult);
+                        zybGak.setGluUnitName(GLUUnitNameResult);
+                        zybGak.setGluMiniRange(GLUMiniRangeResult);
+                        zybGak.setGluMaxRange(GLUMaxRangeResult);
+                        zybGak.setProResult(PROResult);
+                        zybGak.setProUnitName(PROUnitNameResult);
+                        zybGak.setProMiniRange(PROMiniRangeResult);
+                        zybGak.setProMaxRange(PROMaxRangeResult);
+                        zybGak.setUwbcResult(UWBCResult);
+                        zybGak.setUwbcUnitName(UWBCUnitNameResult);
+                        zybGak.setUwbcMiniRange(UWBCMiniRangeResult);
+                        zybGak.setUwbcMaxRange(UWBCMaxRangeResult);
+                        zybGak.setBldResult(BLDResult);
+                        zybGak.setBldUnitName(BLDUnitNameResult);
+                        zybGak.setBldMiniRange(BLDMiniRangeResult);
+                        zybGak.setBldMaxRange(BLDMaxRangeResult);
+                        zybGak.setAltResult(ALTResult);
+                        zybGak.setAltUnitName(ALTUnitNameResult);
+                        zybGak.setAltMiniRange(ALTMiniRangeResult);
+                        zybGak.setAltMaxRange(ALTMaxRangeResult);
+                        zybGak.setChestCode(CHESTCodeResult);
+                        zybGak.setFvcResult(FVCResult);
+                        zybGak.setFvcUnitName(FVCUnitNameResult);
+                        zybGak.setFvcMiniRange(FVCMiniRangeResult);
+                        zybGak.setFvcMaxRange(FVCMaxRangeResult);
+                        zybGak.setFev1Result(FEV1Result);
+                        zybGak.setFev1UnitName(FEV1UnitNameResult);
+                        zybGak.setFev1MiniRange(FEV1MiniRangeResult);
+                        zybGak.setFev1MaxRange(FEV1MaxRangeResult);
+                        zybGak.setFev1fvcResult(FEV1FVCResult);
+                        zybGak.setFev1fvcUnitName(FEV1FVCUnitNameResult);
+                        zybGak.setFev1fvcMiniRange(FEV1FVCMiniRangeResult);
+                        zybGak.setFev1fvcMaxRange(FEV1FVCMaxRangeResult);
+                        zybGak.setbLeadResult(BLeadResult);
+                        zybGak.setbLeadUnitName(BLeadUnitNameResult);
+                        zybGak.setbLeadMiniRange(BLeadMiniRangeResult);
+                        zybGak.setbLeadMaxRange(BLeadMaxRangeResult);
+                        zybGak.setuLeadResult(ULeadResult);
+                        zybGak.setuLeadUnitName(ULeadUnitNameResult);
+                        zybGak.setuLeadMiniRange(ULeadMiniRangeResult);
+                        zybGak.setuLeadMaxRange(ULeadMaxRangeResult);
+                        zybGak.setZppResult(ZPPResult);
+                        zybGak.setZppUnitName(ZPPUnitNameResult);
+                        zybGak.setZppMiniRange(ZPPMiniRangeResult);
+                        zybGak.setZppMaxRange(ZPPMaxRangeResult);
+                        zybGak.setNeutResult(NeutResult);
+                        zybGak.setNeutUnitName(NeutUnitNameResult);
+                        zybGak.setNeutMiniRange(NeutMiniRangeResult);
+                        zybGak.setNeutUnitName(NeutMaxRangeResult);
+                        zybGak.setHearingReuslt(hearingReuslt);
+                        zybGak.setHearingUnitName(hearingUnitNameResult);
+                        zybGak.setHearingMiniRange(hearingMiniRangeResult);
+                        zybGak.setHearingMaxRange(hearingMaxRangeResult);
+                        if(!StringUtils.isEmpty(RPBTCodeResult)){
+                            zybGak.setRpbtCode(Short.parseShort(RPBTCodeResult));
                         }
-                    }else{
-                        String[] CHESTCodeSize = CHESTCodeResult.split(",");
-                        for(int i=0;i<CHESTCodeSize.length;i++){
-                            for(CodeInfo codeInfo : CHESTCodeList){
-                                if(CHESTCodeSize[i].equals(codeInfo.getCode())){
-                                    CHESTCodeInflagList.add(1);
-                                    break;
-                                }
-                            }
-                        }
-                        if(!(CHESTCodeSize.length==CHESTCodeInflagList.size())){
-                            returnCode.setText("102");
-                            message.setText("无法找到胸片编码!");
-                            logger.info("无法找到胸片编码:" + retDoc.asXML());
-                            return retDoc.asXML();
-                        }
+                        //1	已审核2	未审核3	全部m4	已删除
+                        zybGak.setShbz("2");
+                        zybGak.setGluResult(wrightCodeResult);
+                        zybGak.setGluResult(conclusionsCodeResult);
+                        //获取当前系统时间
+                        Date currentTime = new Date();
+                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String dateString = formatter.format(currentTime);
+                        Date currentDate = formatter.parse(dateString);
+                        zybGak.setLogsj(currentDate);
+                        zybGakList.add(zybGak);
                     }
+                    dateStr.clear();
                 }
-
-                //conclusionsCode体检结论编码
-                List<CodeInfo>  conclusionsCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(904));
-                boolean conclusionsCodeflag=false;
-                for(CodeInfo codeInfo : conclusionsCodeList){
-                    if(conclusionsCodeResult.equals(codeInfo.getCode())){
-                        conclusionsCodeflag=true;
-                        break;
-                    }
-                }
-                if(!conclusionsCodeflag){
-                    returnCode.setText("102");
-                    message.setText("无法找到体检结论编码!");
-                    logger.info("无法找到体检结论编码!");
-                    logger.info("无法找到体检结论编码:" + retDoc.asXML());
-                    return retDoc.asXML();
-                }
-                 dateStr.add(bodyDataEntity);
-                //id 为唯一标识codeResult+hosIdResult
-                zybGak.setId(codeResult+hosIdResult);
-                zybGak.setCode(codeResult);
-                zybGak.setHosId(hosIdResult);
-                zybGak.setBirthday(sdf.parse(birthdayResult));
-                zybGak.setOrgCode(orgCodeResult);
-                zybGak.setEmployerName(employerNameResult);
-                zybGak.setName(nameResult);
-                zybGak.setIdcard(idcardResult);
-                zybGak.setBodyCheckType(Short.parseShort(bodyCheckTypeResult));
-                zybGak.setBodyCheckTime(sdf.parse(bodyCheckTimeResult));
-                zybGak.setSexCode(Short.parseShort(sexCodeResult));
-                zybGak.setHazardCode(hazardCodeResult);
-                zybGak.setHazardYear(Short.parseShort(hazardYearResult));
-                zybGak.setHazardMonth(Short.parseShort(hazardMonthResult));
-                zybGak.setSysPressResult(new BigDecimal(sysPressResult));
-                zybGak.setDiasPressResult(new BigDecimal(diasPressResult));
-                zybGak.setEcgCode(ECGCodeResult);
-                zybGak.setConclusionsCode(Short.parseShort(conclusionsCodeResult));
-                zybGak.setTelPhone(telPhoneResult);
-                if(!StringUtils.isEmpty(seniorityYearResult)){
-                    zybGak.setSeniorityYear(Short.parseShort(seniorityYearResult));
-                }
-                if(!StringUtils.isEmpty(seniorityMonthResult)){
-                    zybGak.setSeniorityMonth(Short.parseShort(seniorityMonthResult));
-                }
-                if(!StringUtils.isEmpty(exposureYearResult)){
-                    zybGak.setSeniorityMonth(Short.parseShort(exposureYearResult));
-                }
-                if(!StringUtils.isEmpty(exposureMonthResult)){
-                    zybGak.setExposureMonth(Short.parseShort(exposureMonthResult));
-                }
-                zybGak.setWorkShop(workShopResult);
-                zybGak.setJobCode(jobCodeResult);
-                zybGak.setSysPressUnitName(sysPressUnitNameResult);
-                zybGak.setDiasPressUnitName(diasPressUnitNameResult);
-                zybGak.setWbcResult(WBCResult);
-                zybGak.setWbcUnitName(WBCUnitNameResult);
-                zybGak.setWbcMiniRange(WBCMiniRangeResult);
-                zybGak.setWbcMaxRange(WBCMaxRangeResult);
-                zybGak.setRbcResult(RBCResult);
-                zybGak.setRbcMiniRange(RBCMiniRangeResult);
-                zybGak.setRbcMaxRange(RBCMaxRangeResult);
-                zybGak.setRbcUnitName(RBCUnitNameResult);
-                zybGak.setHbResult(HbResult);
-                zybGak.setHbUnitName(HbUnitNameResult);
-                zybGak.setHbMaxRange(HbMaxRangeResult);
-                zybGak.setHbMiniRange(HbMiniRangeResult);
-                zybGak.setPltResult(PLTResult);
-                zybGak.setPltUnitName(PLTUnitNameResult);
-                zybGak.setPltMaxRange(PLTMaxRangeResult);
-                zybGak.setPltMiniRange(PLTMiniRangeResult);
-                zybGak.setBgluResult(BGLUResult);
-                zybGak.setBgluUnitName(BGLUUnitName);
-                zybGak.setBgluMaxRange(BGLUMaxRange);
-                zybGak.setBgluMiniRange(BGLUMiniRange);
-                zybGak.setGluResult(GLUResult);
-                zybGak.setGluUnitName(GLUUnitNameResult);
-                zybGak.setGluMiniRange(GLUMiniRangeResult);
-                zybGak.setGluMaxRange(GLUMaxRangeResult);
-                zybGak.setProResult(PROResult);
-                zybGak.setProUnitName(PROUnitNameResult);
-                zybGak.setProMiniRange(PROMiniRangeResult);
-                zybGak.setProMaxRange(PROMaxRangeResult);
-                zybGak.setUwbcResult(UWBCResult);
-                zybGak.setUwbcUnitName(UWBCUnitNameResult);
-                zybGak.setUwbcMiniRange(UWBCMiniRangeResult);
-                zybGak.setUwbcMaxRange(UWBCMaxRangeResult);
-                zybGak.setBldResult(BLDResult);
-                zybGak.setBldUnitName(BLDUnitNameResult);
-                zybGak.setBldMiniRange(BLDMiniRangeResult);
-                zybGak.setBldMaxRange(BLDMaxRangeResult);
-                zybGak.setAltResult(ALTResult);
-                zybGak.setAltUnitName(ALTUnitNameResult);
-                zybGak.setAltMiniRange(ALTMiniRangeResult);
-                zybGak.setAltMaxRange(ALTMaxRangeResult);
-                zybGak.setChestCode(CHESTCodeResult);
-                zybGak.setFvcResult(FVCResult);
-                zybGak.setFvcUnitName(FVCUnitNameResult);
-                zybGak.setFvcMiniRange(FVCMiniRangeResult);
-                zybGak.setFvcMaxRange(FVCMaxRangeResult);
-                zybGak.setFev1Result(FEV1Result);
-                zybGak.setFev1UnitName(FEV1UnitNameResult);
-                zybGak.setFev1MiniRange(FEV1MiniRangeResult);
-                zybGak.setFev1MaxRange(FEV1MaxRangeResult);
-                zybGak.setFev1fvcResult(FEV1FVCResult);
-                zybGak.setFev1fvcUnitName(FEV1FVCUnitNameResult);
-                zybGak.setFev1fvcMiniRange(FEV1FVCMiniRangeResult);
-                zybGak.setFev1fvcMaxRange(FEV1FVCMaxRangeResult);
-                zybGak.setbLeadResult(BLeadResult);
-                zybGak.setbLeadUnitName(BLeadUnitNameResult);
-                zybGak.setbLeadMiniRange(BLeadMiniRangeResult);
-                zybGak.setbLeadMaxRange(BLeadMaxRangeResult);
-                zybGak.setuLeadResult(ULeadResult);
-                zybGak.setuLeadUnitName(ULeadUnitNameResult);
-                zybGak.setuLeadMiniRange(ULeadMiniRangeResult);
-                zybGak.setuLeadMaxRange(ULeadMaxRangeResult);
-                zybGak.setZppResult(ZPPResult);
-                zybGak.setZppUnitName(ZPPUnitNameResult);
-                zybGak.setZppMiniRange(ZPPMiniRangeResult);
-                zybGak.setZppMaxRange(ZPPMaxRangeResult);
-                zybGak.setNeutResult(NeutResult);
-                zybGak.setNeutUnitName(NeutUnitNameResult);
-                zybGak.setNeutMiniRange(NeutMiniRangeResult);
-                zybGak.setNeutUnitName(NeutMaxRangeResult);
-                zybGak.setHearingReuslt(hearingReuslt);
-                zybGak.setHearingUnitName(hearingUnitNameResult);
-                zybGak.setHearingMiniRange(hearingMiniRangeResult);
-                zybGak.setHearingMaxRange(hearingMaxRangeResult);
-                if(!StringUtils.isEmpty(RPBTCodeResult)){
-                    zybGak.setRpbtCode(Short.parseShort(RPBTCodeResult));
-                }
-                //1	已审核2	未审核3	全部m4	已删除
-                zybGak.setShbz("2");
-                zybGak.setGluResult(wrightCodeResult);
-                zybGak.setGluResult(conclusionsCodeResult);
-                //获取当前系统时间
-                Date currentTime = new Date();
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String dateString = formatter.format(currentTime);
-                Date currentDate = formatter.parse(dateString);
-                zybGak.setLogsj(currentDate);
-                zybGakList.add(zybGak);
 
             }
            while(employingUnitIte.hasNext()){
@@ -1109,18 +1031,24 @@ public class ReadStringXmlController {
                 String dateString = formatter.format(currentTime);
                 Date currentDate = formatter.parse(dateString);
                 zybYrdw.setLogsj(currentDate);
-                logger.info("系统时间"+dateString);
-                empDateStr.add(zybYrdwDataEntity);
                 ZybYrdw zybYrdwBykey = zybYrdwServiceImpl.selectByPrimaryKey(employerCode);
                 if(zybYrdwBykey!=null){
                     logger.info("更新用人单位数据");
-                    Boolean updteDataFlag= isDateFormate(dateStr,dataInfo);
-                    if(!updteDataFlag){
-                        return retDoc.asXML();
+                    empDateStrUpdate.add(zybYrdwDataEntity);
+                    boolean empDateStrUpdteFg= isDateFormatEmployer(empDateStrUpdate,dataInfo);
+                    empDataStrFlag.add(empDateStrUpdteFg);
+                    if(empDateStrUpdteFg){
+                        zybYrdwServiceImpl.updateByPrimaryKey(zybYrdw);
                     }
-                    zybYrdwServiceImpl.updateByPrimaryKey(zybYrdw);
+                    empDateStrUpdate.clear();
                 }else{
-                    zybYrdwList.add(zybYrdw);
+                    empDateStr.add(zybYrdwDataEntity);
+                    boolean empDataStrFg = isDateFormatEmployer(empDateStr,dataInfo);
+                    empDataStrFlag.add(empDataStrFg);
+                    if(empDataStrFg){
+                        zybYrdwList.add(zybYrdw);
+                    }
+                    empDateStr.clear();
                 }
             }
 
@@ -1131,18 +1059,16 @@ public class ReadStringXmlController {
             logger.info("xml数据解析失败:" + retDoc.asXML());
             return retDoc.asXML();
         }
-        boolean  dataFlag = isDateFormate(dateStr,dataInfo);
-        boolean  empDataFlag = isDateFormatEmployer(empDateStr,dataInfo);
-        if(dataFlag && empDataFlag){
-            if(zybYrdwList!=null && zybYrdwList.size()!=0){
-                zybYrdwServiceImpl.insertBatch(zybYrdwList);
-            }
-            if(zybGakList!=null && zybGakList.size()>0){
-                zybGakServiceImpl.insertBatch(zybGakList);
-            }
+        if(zybYrdwList.size()>0 && zybYrdwList!=null){
+            zybYrdwServiceImpl.insertBatch(zybYrdwList);
+        }
+        if(zybGakList.size()>0 && zybGakList!=null){
+            zybGakServiceImpl.insertBatch(zybGakList);
+        }
+       if(!(empDataStrFlag.contains(false)||dateStrFlag.contains(false))){
             returnCode.setText("0");
             message.setText("成功!");
-        }
+       }
         return retDoc.asXML();
     }
 
@@ -1169,38 +1095,24 @@ public class ReadStringXmlController {
         dataInfo.element("message").setText("部分数据格式有误!");
         Element errorDatas = dataInfo.addElement("errorDatas");
         Element errorReportCards = errorDatas.addElement("errorReportCards");
-        Element errorEmployingUnits = errorDatas.addElement("errorEmployingUnits");
         //参数日期格式判断
         SimpleDateFormat format = new SimpleDateFormat("YYYYMMdd");
         for (BodyDataEntity reportCard : dateStr) {
-            //判断code是否唯一
-            HashMap<String,String> hashMap = new HashMap<String,String>();
-            hashMap.put("code",reportCard.getCode());
-            hashMap.put("hosId",reportCard.getHosId());
-            logger.info("code:" +reportCard.getCode()+"--hosId:" +reportCard.getHosId());
-            boolean isOnlyDataFlag = isOnlyData(hashMap);
-            logger.info("===employerCode==="+reportCard.getEmployerCode());
-            if(!isOnlyDataFlag){
-                Element errorData = errorReportCards.addElement("errorData");
-                Element errorMessage = errorData.addElement("errorMessage");
-                Element reportCardId = errorData.addElement("reportCard");
-                reportCardId.setText(reportCard.getCode());
-                errorMessage.setText("报告编号在该医院已经存在!");
-                flag = false;
-            }
             //判断code格式
-            if(!StringUtils.isEmpty(reportCard.getCode())) {
-                boolean formatCodeFlag = CommonUtils.isLetterDigit(reportCard.getCode());
-                boolean formatCodeLenFlag = CommonUtils.isMaxLength(reportCard.getCode(), 16);
-                if (!(formatCodeFlag && formatCodeLenFlag)) {
-                    Element errorData = errorReportCards.addElement("errorData");
-                    Element errorMessage = errorData.addElement("errorMessage");
-                    Element reportCardId = errorData.addElement("reportCard");
-                    reportCardId.setText(reportCard.getCode());
-                    errorMessage.setText("报告编号格式不正确!");
-                    flag = false;
+                if(!StringUtils.isEmpty(reportCard.getCode())) {
+                    boolean formatCodeFlag = CommonUtils.isLetterDigit(reportCard.getCode());
+                    boolean formatCodeLenFlag = CommonUtils.isMaxLength(reportCard.getCode(), 16);
+                    if (!(formatCodeFlag && formatCodeLenFlag)) {
+                        Element errorData = errorReportCards.addElement("errorData");
+                        Element errorMessage = errorData.addElement("errorMessage");
+                        Element reportCardId = errorData.addElement("reportCard");
+                        reportCardId.setText(reportCard.getCode());
+                        errorMessage.setText("报告编号格式不正确!");
+                        flag = false;
 
+                    }
                 }
+
                 //判断医院hosId格式
                 if (!StringUtils.isEmpty(reportCard.getHosId())) {
                     Boolean digitLenFlag = CommonUtils.isDigist(reportCard.getHosId());
@@ -1413,7 +1325,6 @@ public class ReadStringXmlController {
                                 flag = false;
                             }
                             for (CodeInfo codeInfo : hazardCodeList) {
-                                logger.info("===codeInfo.getCode()==="+codeInfo.getCode());
                                 if (reportCard.getHazardCode().equals(codeInfo.getCode())) {
                                     hazardCodeInflag = true;
                                     break;
@@ -1437,7 +1348,6 @@ public class ReadStringXmlController {
                                         break;
                                     }
                                     for (CodeInfo codeInfo : hazardCodeList) {
-                                        logger.info("===codeInfo.getCode()==="+codeInfo.getCode());
                                         if (hazardCodSize[i].equals(codeInfo.getCode())) {
                                             hazardCodeInflag = true;
                                             break;
@@ -2922,13 +2832,35 @@ public class ReadStringXmlController {
                         }
                     }
                 }
+                //conclusionsCode体检结论编码
+                List<CodeInfo> conclusionsCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(904));
+                if(!StringUtils.isEmpty(reportCard.getConclusionsCode())){
+                    boolean conclusionsCodeListInflag = false;
+                    for (CodeInfo codeInfo : conclusionsCodeList) {
+                        logger.info("===codeInfo.getCode()==="+codeInfo.getCode());
+                        if (reportCard.getConclusionsCode().equals(codeInfo.getCode())) {
+                            conclusionsCodeListInflag = true;
+                            logger.info("====reportCard.getConclusionsCode()====="+reportCard.getConclusionsCode()+"===codeInfo.getCode()==="+codeInfo.getCode());
+                            break;
+                        }
+                    }
+                    logger.info("===conclusionsCodeListInflag==="+conclusionsCodeListInflag+"===reportCard.getCode()==="+reportCard.getCode());
+                    if (!conclusionsCodeListInflag) {
+                        Element errorData = errorReportCards.addElement("errorData");
+                        Element errorMessage = errorData.addElement("errorMessage");
+                        Element reportCardId = errorData.addElement("reportCard");
+                        reportCardId.setText(reportCard.getCode());
+                        errorMessage.setText("体检结论编码不正确!");
+                        flag = false;
+                    }
+                }
             }
-        }
-        if(flag){
+        if(flag==true){
             dataInfo.remove(errorDatas);
         }
-        return flag;
+           return flag;
     }
+
     //用人单位数据个格式校验
     private boolean isDateFormatEmployer(List<BodyDataEntity> dateStr, Element dataInfo){
         boolean flag = true;
@@ -3165,10 +3097,9 @@ public class ReadStringXmlController {
                     flag = false;
                 }
             }
-            if(flag==true){
-                dataInfo.remove(errorDatas);
-            }
-
+        }
+        if(flag==true){
+            dataInfo.remove(errorDatas);
         }
         return flag;
     }
