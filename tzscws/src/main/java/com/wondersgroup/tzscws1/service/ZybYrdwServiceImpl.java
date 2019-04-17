@@ -38,4 +38,14 @@ public class ZybYrdwServiceImpl implements  ZybYrdwService{
     public List<ZybYrdw> selectByNameList(List<String> nameList) {
         return zybYrdwMapper.selectByNameList(nameList);
     }
+
+    /**
+     * 根据creditCode查找
+     */
+   public ZybYrdw selectByCreditCode(String creditCode){
+        return zybYrdwMapper.selectByCreditCode(creditCode);
+    }
+    public boolean insertBatch(List<ZybYrdw> zybYrdwList){
+        return zybYrdwMapper.insertBatch(zybYrdwList);
+    }
 }

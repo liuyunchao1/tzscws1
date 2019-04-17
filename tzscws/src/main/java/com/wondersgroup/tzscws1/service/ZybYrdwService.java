@@ -28,4 +28,15 @@ public interface ZybYrdwService {
      */
     List<ZybYrdw> selectByNameList(List<String> nameList);
 
+    /**
+     * 根据creditCode查找
+     */
+    ZybYrdw selectByCreditCode(String creditCode);
+
+    /**
+     * 批量插入
+     * @param zybYrdwList
+     * @return
+     */
+    public boolean insertBatch(List<ZybYrdw> zybYrdwList);
 }
