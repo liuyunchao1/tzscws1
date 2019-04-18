@@ -861,7 +861,6 @@ public class ReadStringXmlController {
 
             }
            while(employingUnitIte.hasNext()){
-                ZybYrdw zybYrdw = new ZybYrdw();
                 //数据校验实体
                 BodyDataEntity zybYrdwDataEntity = new BodyDataEntity();
                 Element employingUnit = (Element) employingUnitIte.next();
@@ -973,64 +972,7 @@ public class ReadStringXmlController {
                    logger.info("用人单位请求参数contactPhone为空值:" + retDoc.asXML());
                    return retDoc.asXML();
                }
-               //economicCode经济类型编码
-               List<CodeInfo>  economicCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(906));
-               boolean economicCodeflag=false;
-               for(CodeInfo codeInfo : economicCodeList){
-                   if(economicCode.equals(codeInfo.getCode())){
-                       economicCodeflag=true;
-                       break;
-                   }
-               }
-               if(!economicCodeflag){
-                   returnCode.setText("102");
-                   message.setText("无法找到经济类型编码!");
-                   logger.info("无法找到经济类型编码!");
-                   logger.info("无法找到经济类型编码:" + retDoc.asXML());
-                   return retDoc.asXML();
-               }
-               //enterpriseCode企业规模编码
-               List<CodeInfo>  enterpriseCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(905));
-               boolean enterpriseCodeflag=false;
-               for(CodeInfo codeInfo : enterpriseCodeList){
-                   if(enterpriseCode.equals(codeInfo.getCode())){
-                       enterpriseCodeflag=true;
-                       break;
-                   }
-               }
-               if(!enterpriseCodeflag){
-                   returnCode.setText("102");
-                   message.setText("无法找到企业规模编码!");
-                   logger.info("无法找到企业规模编码!");
-                   logger.info("无法找到企业规模编码:" + retDoc.asXML());
-                   return retDoc.asXML();
-               }
-                zybYrdw.setCreditCode(creditCode);
-                zybYrdw.setEmployerCode(employerCode);
-                zybYrdw.setEmployerName(employerNameEN);
-                zybYrdw.setEmployerDesc(employerDesc);
-                zybYrdw.setAreaStandard(areaStandard);
-                zybYrdw.setAreaAddress(areaAddress);
-                zybYrdw.setEconomicCode(economicCode);
-                zybYrdw.setIndustryCateCode(industryCateCode);
-                zybYrdw.setEnterpriseCode(enterpriseCode);
-                if(!StringUtils.isEmpty(secondEmployerCode)){
-                    zybYrdw.setSecondEmployerCode(secondEmployerCode);
-                }
-                zybYrdw.setSecondEmployerName(secondEmployerName);
-                zybYrdw.setPostAddress(postAddress);
-                zybYrdw.setZipCode(zipCode);
-                zybYrdw.setContactPerson(contactPerson);
-                zybYrdw.setContactPhone(contactPhone);
-                zybYrdw.setMonitorOrgCode(monitorOrgCode);
-                zybYrdw.setMonitorOrgName(monitorOrgName);
-                zybYrdw.setRemarks(remarks);
-                //获取当前系统时间
-                Date currentTime = new Date();
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String dateString = formatter.format(currentTime);
-                Date currentDate = formatter.parse(dateString);
-                zybYrdw.setLogsj(currentDate);
+
                 ZybYrdw zybYrdwBykey = zybYrdwServiceImpl.selectByPrimaryKey(employerCode);
                 if(zybYrdwBykey!=null){
                     logger.info("更新用人单位数据");
@@ -1038,14 +980,68 @@ public class ReadStringXmlController {
                     boolean empDateStrUpdteFg= isDateFormatEmployer(empDateStrUpdate,dataInfo);
                     empDataStrFlag.add(empDateStrUpdteFg);
                     if(empDateStrUpdteFg){
+                        ZybYrdw zybYrdw = new ZybYrdw();
+                        zybYrdw.setCreditCode(creditCode);
+                        zybYrdw.setEmployerCode(employerCode);
+                        zybYrdw.setEmployerName(employerNameEN);
+                        zybYrdw.setEmployerDesc(employerDesc);
+                        zybYrdw.setAreaStandard(areaStandard);
+                        zybYrdw.setAreaAddress(areaAddress);
+                        zybYrdw.setEconomicCode(economicCode);
+                        zybYrdw.setIndustryCateCode(industryCateCode);
+                        zybYrdw.setEnterpriseCode(enterpriseCode);
+                        if(!StringUtils.isEmpty(secondEmployerCode)){
+                            zybYrdw.setSecondEmployerCode(secondEmployerCode);
+                        }
+                        zybYrdw.setSecondEmployerName(secondEmployerName);
+                        zybYrdw.setPostAddress(postAddress);
+                        zybYrdw.setZipCode(zipCode);
+                        zybYrdw.setContactPerson(contactPerson);
+                        zybYrdw.setContactPhone(contactPhone);
+                        zybYrdw.setMonitorOrgCode(monitorOrgCode);
+                        zybYrdw.setMonitorOrgName(monitorOrgName);
+                        zybYrdw.setRemarks(remarks);
+                        //获取当前系统时间
+                        Date currentTime = new Date();
+                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String dateString = formatter.format(currentTime);
+                        Date currentDate = formatter.parse(dateString);
+                        zybYrdw.setLogsj(currentDate);
                         zybYrdwServiceImpl.updateByPrimaryKey(zybYrdw);
                     }
                     empDateStrUpdate.clear();
                 }else{
+                    ZybYrdw zybYrdw = new ZybYrdw();
                     empDateStr.add(zybYrdwDataEntity);
                     boolean empDataStrFg = isDateFormatEmployer(empDateStr,dataInfo);
                     empDataStrFlag.add(empDataStrFg);
                     if(empDataStrFg){
+                        zybYrdw.setCreditCode(creditCode);
+                        zybYrdw.setEmployerCode(employerCode);
+                        zybYrdw.setEmployerName(employerNameEN);
+                        zybYrdw.setEmployerDesc(employerDesc);
+                        zybYrdw.setAreaStandard(areaStandard);
+                        zybYrdw.setAreaAddress(areaAddress);
+                        zybYrdw.setEconomicCode(economicCode);
+                        zybYrdw.setIndustryCateCode(industryCateCode);
+                        zybYrdw.setEnterpriseCode(enterpriseCode);
+                        if(!StringUtils.isEmpty(secondEmployerCode)){
+                            zybYrdw.setSecondEmployerCode(secondEmployerCode);
+                        }
+                        zybYrdw.setSecondEmployerName(secondEmployerName);
+                        zybYrdw.setPostAddress(postAddress);
+                        zybYrdw.setZipCode(zipCode);
+                        zybYrdw.setContactPerson(contactPerson);
+                        zybYrdw.setContactPhone(contactPhone);
+                        zybYrdw.setMonitorOrgCode(monitorOrgCode);
+                        zybYrdw.setMonitorOrgName(monitorOrgName);
+                        zybYrdw.setRemarks(remarks);
+                        //获取当前系统时间
+                        Date currentTime = new Date();
+                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String dateString = formatter.format(currentTime);
+                        Date currentDate = formatter.parse(dateString);
+                        zybYrdw.setLogsj(currentDate);
                         zybYrdwList.add(zybYrdw);
                     }
                     empDateStr.clear();
@@ -2939,15 +2935,31 @@ public class ReadStringXmlController {
                 }
             }
             //economicCode经济类型编码
-            if (!StringUtils.isEmpty(reportCard.getEconomicCode())) {
+            List<CodeInfo>  economicCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(906));
+            if(!StringUtils.isEmpty(reportCard.getEconomicCode())){
                 boolean formaAreaAddressFlag = CommonUtils.isLetterDigit(reportCard.getEconomicCode());
                 boolean formatAreaAddressLenFlag = CommonUtils.isMaxLength(reportCard.getEconomicCode(), 4);
+                boolean economicCodeflag = false;
                 if (!(formaAreaAddressFlag && formatAreaAddressLenFlag)) {
                     Element errorData = errorEmployingUnits.addElement("errorData");
                     Element errorMessage = errorData.addElement("errorMessage");
                     Element employingUnit = errorData.addElement("employingUnit");
                     employingUnit.setText(reportCard.getEmployerCode());
                     errorMessage.setText("经济类型编码格式不正确!");
+                    flag = false;
+                }
+                for (CodeInfo codeInfo : economicCodeList) {
+                    if (reportCard.getEconomicCode().equals(codeInfo.getCode())) {
+                        economicCodeflag = true;
+                        break;
+                    }
+                }
+                if (!economicCodeflag) {
+                    Element errorData = errorEmployingUnits.addElement("errorData");
+                    Element errorMessage = errorData.addElement("errorMessage");
+                    Element employingUnit = errorData.addElement("employingUnit");
+                    employingUnit.setText(reportCard.getEmployerCode());
+                    errorMessage.setText("经济类型编码格式值不正确!");
                     flag = false;
                 }
             }
@@ -2965,15 +2977,31 @@ public class ReadStringXmlController {
                 }
             }
             //enterpriseCode企业规模编码
-            if (!StringUtils.isEmpty(reportCard.getEnterpriseCode())) {
+            List<CodeInfo>  enterpriseCodeList = codeInfoServiceImpl.selectByCodeInfoId(new BigDecimal(905));
+            if(!StringUtils.isEmpty(reportCard.getEnterpriseCode())){
                 boolean formaEnterpriseCodeFlag = CommonUtils.isDigist(reportCard.getEnterpriseCode());
                 boolean formatEnterpriseCodeLenFlag = CommonUtils.isLength(reportCard.getEnterpriseCode(), 3);
+                boolean enterpriseCodeflag = false;
                 if (!(formaEnterpriseCodeFlag && formatEnterpriseCodeLenFlag)) {
                     Element errorData = errorEmployingUnits.addElement("errorData");
                     Element errorMessage = errorData.addElement("errorMessage");
                     Element employingUnit = errorData.addElement("employingUnit");
                     employingUnit.setText(reportCard.getEmployerCode());
                     errorMessage.setText("企业规模编码格式不正确!");
+                    flag = false;
+                }
+                for (CodeInfo codeInfo : enterpriseCodeList) {
+                    if (reportCard.getEnterpriseCode().equals(codeInfo.getCode())) {
+                        enterpriseCodeflag = true;
+                        break;
+                    }
+                }
+                if (!enterpriseCodeflag) {
+                    Element errorData = errorEmployingUnits.addElement("errorData");
+                    Element errorMessage = errorData.addElement("errorMessage");
+                    Element employingUnit = errorData.addElement("employingUnit");
+                    employingUnit.setText(reportCard.getEmployerCode());
+                    errorMessage.setText("企业规模编码格式值不正确!");
                     flag = false;
                 }
             }
